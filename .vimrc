@@ -21,6 +21,7 @@ Plugin 'VundleVim/Vundle.vim'
 Plugin 'scrooloose/nerdtree'
 "Plugin 'valloric/youcompleteme'
 Plugin 'vim-airline/vim-airline'
+Plugin 'vim-airline/vim-airline-themes'
 
 " === plugins thet better to install
 Plugin 'majutsushi/tagbar'
@@ -86,3 +87,4 @@ augroup END
 
 " ==== VIM-AIRLINE
 let g:airline_section_x = '%{PencilMode()}'
+let g:airline_theme='powerlineish'
