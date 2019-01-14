@@ -3,9 +3,11 @@ set shell=/usr/bin/bash
 filetype off                  " required
 " ==== some configurations
 set number
-set rtp+=~/.fzf
+"set rtp+=~/.fzf
 set tabstop=4
 set mouse=a
+"set t_Co=256
+
 
 " set the runtime path to include Vundle and initialize
 set rtp+=~/.vim/bundle/Vundle.vim
@@ -24,14 +26,14 @@ Plugin 'vim-airline/vim-airline'
 Plugin 'vim-airline/vim-airline-themes'
 
 " === plugins thet better to install
-Plugin 'majutsushi/tagbar'
+"Plugin 'majutsushi/tagbar'
 Plugin 'kien/ctrlp.vim'
-Plugin 'tpope/vim-fugitive'
+"Plugin 'tpope/vim-fugitive'
 Plugin 'airblade/vim-gitgutter'
 Plugin 'vim-syntastic/syntastic'
 "Plugin 'terryma/vim-multiple-cursors'
 Plugin 'plasticboy/vim-markdown'
-Plugin 'reedes/vim-pencil' 
+Plugin 'reedes/vim-pencil'
 
 " === plugins named snippets - for programming languages
 Plugin 'sirver/ultisnips'
@@ -53,10 +55,10 @@ filetype plugin indent on    " required
 " see :h vundle for more details or wiki for FAQ
 " Put your non-Plugin stuff after this line
 
+
 " ==== NERDTREE
 " === this one from https://github.com/sebbekarlsson/i3/blob/master/.vimrc
 "let NERDTreeIgnore = ['__pycache__', '\.pyc$', '\.o$', '\.so$', '\.a$', '\.swp', '*\.swp', '\.swo', '\.swn', '\.swh', '\.swm', '\.swl', '\.swk', '\.sw*$', '[a-zA-Z]*egg[a-zA-Z]*', '.DS_Store']
-
 let NERDTreeShowHidden=1
 let g:NERDTreeWinPos="left"
 let g:NERDTreeDirArrows=0
@@ -88,3 +90,4 @@ augroup END
 " ==== VIM-AIRLINE
 let g:airline_section_x = '%{PencilMode()}'
 let g:airline_theme='powerlineish'
+let g:airline#extensions#tabline#enabled = 1
