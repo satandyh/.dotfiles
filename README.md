@@ -20,7 +20,7 @@ configs for my env
 4. do the same for all users
 
 * * *
-# bashit and .bashrc
+# bash_it and .bashrc
 
 1. install bash_it from `https://github.com/Bash-it/bash-it` thru git way
 2. copy .bashrc file to `~/.bashrc`
