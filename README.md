@@ -22,7 +22,7 @@ configs for my env
 * * *
 # bash_it and .bashrc
 
-1. install bash_it from `https://github.com/Bash-it/bash-it` thru git way
+1. install [bash_it](https://github.com/Bash-it/bash-it) thru git way
 2. copy .bashrc file to `~/.bashrc`
 3. do the same for all users
 
