@@ -7,6 +7,8 @@ set number
 set tabstop=4
 set mouse=a
 "set t_Co=256
+set splitbelow
+set splitright
 
 
 " set the runtime path to include Vundle and initialize
