@@ -4,6 +4,7 @@ configs for my env
 # TODO
 
 1. look at https://github.com/github/gitignore/tree/master/Global - there should be a lot of fun
+2. look at tmux configs and colorschemes
 
 * * *
 # .gitignore_global
