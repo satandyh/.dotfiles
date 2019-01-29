@@ -27,3 +27,10 @@ configs for my env
 3. do the same for all users
 
 * * *
+# tmux
+
+1. install tmux as usual
+2. copy .tmux.conf to home directory
+3. do the same for all users
+
+* * *
