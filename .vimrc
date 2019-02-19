@@ -100,3 +100,8 @@ let g:airline#extensions#tabline#enabled = 1
 syntax enable
 colorscheme gruvbox
 set background=dark
+
+" ==== whitespace highlite
+highlight ExtraWhitespace ctermbg=darkred guibg=darkred
+match ExtraWhitespace /\s\+$/
+
