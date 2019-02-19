@@ -102,6 +102,5 @@ colorscheme gruvbox
 set background=dark
 
 " ==== whitespace highlite
-highlight ExtraWhitespace ctermbg=darkred guibg=darkred
-match ExtraWhitespace /\s\+$/
-
+highlight ExtraWhitespace ctermbg=darkgray guibg=darkgray
+match ExtraWhitespace /\s\+$\|^\s\+\ze[0-z]/
