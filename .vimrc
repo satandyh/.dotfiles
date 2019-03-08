@@ -1,25 +1,25 @@
-set nocompatible              " be iMproved, required                                                                                                 
-set shell=/usr/bin/bash                                                                                                                               
-filetype off                  " required                                                                                                              
-" ==== some configurations                                                                                                                            
-set number                                                                                                                                            
-"set rtp+=~/.fzf                                                                                                                                      
-set tabstop=4                                                                                                                                         
-set mouse=a                                                                                                                                           
-"set t_Co=256                                                                                                                                         
-set splitbelow                                                                                                                                        
-set splitright                                                                                                                                        
-set termguicolors                                                                                                                                     
-                                                                                                                                                      
-                                                                                                                                                      
-" set the runtime path to include Vundle and initialize                                                                                               
-set rtp+=~/.vim/bundle/Vundle.vim                                                                                                                     
-call vundle#begin()                                                                                                                                   
-" alternatively, pass a path where Vundle should install plugins                                                                                      
-"call vundle#begin('~/some/path/here')                                                                                                                
-                                                                                                                                                      
-" let Vundle manage Vundle, required                                                                                                                  
-" === plugin manager                                                                                                                                  
+set nocompatible              " be iMproved, required
+set shell=/usr/bin/bash
+filetype off                  " required
+" ==== some configurations
+set number
+"set rtp+=~/.fzf
+set tabstop=4
+set mouse=a
+"set t_Co=256
+set splitbelow
+set splitright
+set termguicolors
+
+
+" set the runtime path to include Vundle and initialize
+set rtp+=~/.vim/bundle/Vundle.vim
+call vundle#begin()
+" alternatively, pass a path where Vundle should install plugins
+"call vundle#begin('~/some/path/here')
+
+" let Vundle manage Vundle, required
+" === plugin manager
 Plugin 'VundleVim/Vundle.vim'
 
 " === plugins that just #should be#
@@ -59,9 +59,9 @@ filetype plugin indent on    " required
 " see :h vundle for more details or wiki for FAQ
 " Put your non-Plugin stuff after this line
 
-" ==== NERDTREE                                                                                                                                                                                                    
-" === this one from https://github.com/sebbekarlsson/i3/blob/master/.vimrc                                                                                                                                         
-"let NERDTreeIgnore = ['__pycache__', '\.pyc$', '\.o$', '\.so$', '\.a$', '\.swp', '*\.swp', '\.swo', '\.swn', '\.swh', '\.swm', '\.swl', '\.swk', '\.sw*$', '[a-zA-Z]*egg[a-zA-Z]*', '.DS_Store']                 
+" ==== NERDTREE
+" === this one from https://github.com/sebbekarlsson/i3/blob/master/.vimrc
+"let NERDTreeIgnore = ['__pycache__', '\.pyc$', '\.o$', '\.so$', '\.a$', '\.swp', '*\.swp', '\.swo', '\.swn', '\.swh', '\.swm', '\.swl', '\.swk', '\.sw*$', '[a-zA-Z]*egg[a-zA-Z]*', '.DS_Store']
 let NERDTreeShowHidden=1
 let g:NERDTreeWinPos="left"
 let g:NERDTreeDirArrows=0
