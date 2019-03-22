@@ -104,3 +104,14 @@ set background=dark
 " ==== whitespace highlite
 highlight ExtraWhitespace ctermbg=darkgray guibg=darkgray
 match ExtraWhitespace /\s\+$\|^\s\+\ze[0-z]/
+
+" ==== vim antipatterns
+" thank's to Tom Ryder
+noremap ^[OA <Nop>
+noremap ^[OB <Nop>
+noremap ^[OD <Nop>
+noremap ^[OC <Nop>
+noremap <Up> <Nop>
+noremap <Down> <Nop>
+noremap <Left> <Nop>
+noremap <Right> <Nop>
