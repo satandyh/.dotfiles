@@ -10,6 +10,8 @@ export BASH_IT_THEME='powerline'
 export POWERLINE_PROMPT="user_info scm wd"
 export TERM='xterm-256color'
 
+alias dotfiles='/usr/local/bin/git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME'
+
 # (Advanced): Change this to the name of your remote repo if you
 # cloned bash-it with a remote other than origin such as `bash-it`.
 # export BASH_IT_REMOTE='bash-it'
