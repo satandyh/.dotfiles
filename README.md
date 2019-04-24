@@ -1,10 +1,5 @@
 # dotfiles
 configs for my env
-* * *
-# TODO
-
-1. look at https://github.com/github/gitignore/tree/master/Global - there should be a lot of fun
-2. look at tmux configs and colorschemes
 
 * * *
 # .gitignore_global
@@ -13,7 +8,7 @@ configs for my env
 2. run `git config --global core.excludesfile ~/.gitignore_global`
 
 * * *
-# .vimrc
+# VundleVim and .vimrc
 
 1. install vundle from this repo [VundleVim](https://github.com/VundleVim/Vundle.vim)
 2. copy .vimrc file to `~/.vimrc`
@@ -35,3 +30,5 @@ configs for my env
 3. do the same for all users
 
 * * *
+# very good instruction which I'd like to use on all of my machines
+[A simpler way to manage your dotfiles](https://www.anand-iyer.com/blog/2018/a-simpler-way-to-manage-your-dotfiles.html)
