@@ -107,11 +107,24 @@ match ExtraWhitespace /\s\+$\|^\s\+\ze[0-z]/
 
 " ==== vim antipatterns
 " thank's to Tom Ryder
-noremap ^[OA <Nop>
-noremap ^[OB <Nop>
-noremap ^[OD <Nop>
-noremap ^[OC <Nop>
-noremap <Up> <Nop>
-noremap <Down> <Nop>
-noremap <Left> <Nop>
-noremap <Right> <Nop>
+noremap OA <nop>
+noremap OB <nop>
+noremap OC <nop>
+noremap OD <nop>
+noremap [1~ <nop>
+noremap [4~ <nop>
+noremap [5~ <nop>
+noremap [6~ <nop>
+
+"noremap <Up> <nop>
+"noremap <Down> <nop>
+"noremap <Left> <nop>
+"noremap <Right> <nop>
+"noremap <home> <nop>
+"noremap <end> <nop>
+"noremap <pageup> <nop>
+"noremap <pagedown> <nop>
+
+" ==== transparent background
+hi Normal guibg=NONE ctermbg=NONE
+
