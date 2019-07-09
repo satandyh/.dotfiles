@@ -4,7 +4,7 @@ filetype off                  " required
 " ==== some configurations
 set number
 "set rtp+=~/.fzf
-set tabstop=4
+set tabstop=2
 set mouse=a
 "set t_Co=256
 set splitbelow

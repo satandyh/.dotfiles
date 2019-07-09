@@ -55,5 +55,14 @@ export SCM_CHECK=true
 # Uncomment this to make Bash-it create alias reload.
 # export BASH_IT_RELOAD_LEGACY=1
 
+export PATH="$PATH:/opt/hashicorp_vault"
+export PATH="$PATH:/opt/hashicorp_consul"
+export PATH="$PATH:/opt/hashicorp_terraform"
+
+complete -C /opt/hashicorp_vault/vault vault
+complete -C /opt/hashicorp_consul/consul consul
+complete -C /opt/hashicorp_terraform/terraform terraform
+
 # Load Bash It
 source "$BASH_IT"/bash_it.sh
+
