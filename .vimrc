@@ -103,7 +103,7 @@ set background=dark
 
 " ==== whitespace highlite
 highlight ExtraWhitespace ctermbg=darkgray guibg=darkgray
-match ExtraWhitespace /\s\+$\|^\s\+\ze[0-z]/
+match ExtraWhitespace /\s\+$\|^\s\+\ze\S/
 
 " ==== vim antipatterns
 " thank's to Tom Ryder
