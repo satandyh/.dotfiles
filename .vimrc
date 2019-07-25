@@ -101,9 +101,10 @@ syntax enable
 colorscheme gruvbox
 set background=dark
 
-" ==== whitespace highlite
+" ==== highlighting whitespace and each 80th character
 highlight ExtraWhitespace ctermbg=darkgray guibg=darkgray
 match ExtraWhitespace /\s\+$\|^\s\+\ze\S/
+call matchadd('ErrorMsg', '\%81v', 100)
 
 " ==== vim antipatterns
 " thank's to Tom Ryder
