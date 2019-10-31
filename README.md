@@ -25,7 +25,7 @@ configs for my env
 * * *
 # tmux
 
-1. install tmux as usual
+1. install tmux and xsel as usual
 2. copy .tmux.conf to home directory
 3. do the same for all users
 
