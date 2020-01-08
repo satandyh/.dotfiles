@@ -1,7 +1,8 @@
 # shell
 
 Use zsh with oh-my-zsh  
-plugins=(git docker tmux zsh-autosuggestions zsh-syntax-highlighting command-time)
+plugins=(git docker tmux zsh-autosuggestions zsh-syntax-highlighting command-time)  
+может еще fzf?
 
 # dotfiles
 configs for my env
