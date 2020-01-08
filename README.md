@@ -1,3 +1,8 @@
+# shell
+
+Use zsh with oh-my-zsh  
+plugins=(git docker tmux zsh-autosuggestions zsh-syntax-highlighting command-time)
+
 # dotfiles
 configs for my env
 
