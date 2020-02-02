@@ -1,0 +1,37 @@
+---
+# Alacritty
+- name: check repo
+  yum_repository:
+    name: "alacritty"
+    baseurl: "https://copr-be.cloud.fedoraproject.org/results/pschyska/alacritty/fedora-{{ base_distr_release }}-$basearch/type=rpm-md"
+    description: "Copr repo for alacritty owned by pschyska"
+    gpgkey: "https://copr-be.cloud.fedoraproject.org/results/pschyska/alacritty/pubkey.gpg"
+    state: present
+    gpgcheck: true
+    enabled: true
+  become: true
+  tags:
+    - alacritty
+
+- name: install alacritty
+  dnf:
+    name: alacritty
+    state: latest
+  become: true
+  tags:
+    - alacritty
+
+- name: create config directory
+  file:
+    path: "~/.config/alacritty"
+    state: directory
+    recurse: true
+  tags:
+    - alacritty
+
+- name: copy config
+  copy:
+    src: alacritty.yml
+    dest: "~/.config/alacritty/alacritty.yml"
+  tags:
+    - alacritty

@@ -1,9 +1,0 @@
-[core]
-	excludesfile = $HOME/.gitignore_global
-	autocrlf = input
-[user]
-	name = satandyh
-[help]
-	autocorrect = 1
-[color]
-	ui = always

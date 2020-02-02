@@ -1,0 +1,84 @@
+---
+# Install system necessary components
+
+# Fonts: Fira Code and Fira Sans
+- name: Fonts block
+  block:
+    - name: add font repos
+      yum_repository:
+        name: "evana-fira-code-fonts"
+        baseurl: "https://copr-be.cloud.fedoraproject.org/results/evana/fira-code-fonts/fedora-{{ base_distr_release }}-$basearch/"
+        description: "Copr repo for fira-code-fonts owned by evana"
+        gpgkey: "https://copr-be.cloud.fedoraproject.org/results/evana/fira-code-fonts/pubkey.gpg"
+        state: present
+        gpgcheck: true
+        enabled: true
+
+    - name: install fonts
+      dnf:
+        name:
+          - fira-code-fonts
+          - mozilla-fira-fonts-common
+          - mozilla-fira-mono-fonts
+          - mozilla-fira-sans-fonts
+        state: latest
+  become: true
+  tags:
+    - fonts
+
+# Git ignore file
+- name: copy git ignore file
+  copy:
+    src: ".gitignore_global"
+    dest: "~/.gitignore_global"
+  tags:
+    - git
+
+- name: pass git config
+  command:
+    cmd: "git config --global core.excludesfile ~/.gitignore_global"
+  tags:
+    - git
+
+# Tuned
+- name: Tuned block
+  block:
+    - name: install tuned
+      dnf:
+        name: tuned
+        state: latest
+
+    - name: config tuned
+      command:
+        cmd: tuned-adm profile balanced
+
+    - name: enable tuned
+      service:
+        name: "tuned"
+        enabled: true
+        state: "restarted"
+  become: true
+  tags:
+    - tuned
+
+# VS code
+- name: VScode block
+  block:
+    - name: add code repos
+      yum_repository:
+        name: "code"
+        baseurl: "https://packages.microsoft.com/yumrepos/vscode"
+        description: "Visual Studio Code"
+        gpgkey: "https://packages.microsoft.com/keys/microsoft.asc"
+        state: present
+        gpgcheck: true
+        enabled: true
+
+    - name: install code
+      dnf:
+        name:
+          - code
+        state: latest
+  become: true
+  tags:
+    - code

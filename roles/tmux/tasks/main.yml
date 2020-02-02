@@ -1,0 +1,35 @@
+---
+# Tmux
+- name: install tmux
+  dnf:
+    name:
+      - tmux
+      - xsel
+    state: present
+  become: true
+  tags:
+    - tmux
+
+- name: create dir for tpm (tmux plugin manager)
+  file:
+    path: "~/.tmux/plugins/tpm"
+    state: directory
+    recurse: true
+  tags:
+    - tmux
+
+- name: copy tpm (tmux plugin manager)
+  git:
+    clone: true
+    repo: "https://github.com/tmux-plugins/tpm.git"
+    dest: "~/.tmux/plugins/tpm"
+    update: true
+  tags:
+    - tmux
+
+- name: copy tmux config
+  copy:
+    src: ".tmux.conf"
+    dest: "~/.tmux.conf"
+  tags:
+    - tmux

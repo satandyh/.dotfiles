@@ -128,4 +128,3 @@ noremap [6~ <nop>
 
 " ==== transparent background
 hi Normal guibg=NONE ctermbg=NONE
-
