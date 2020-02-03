@@ -3,7 +3,7 @@
 - name: check repo
   yum_repository:
     name: "alacritty"
-    baseurl: "https://copr-be.cloud.fedoraproject.org/results/pschyska/alacritty/fedora-{{ base_distr_release }}-$basearch/type=rpm-md"
+    baseurl: "https://copr-be.cloud.fedoraproject.org/results/pschyska/alacritty/fedora-{{ base_distr_release }}-$basearch/"
     description: "Copr repo for alacritty owned by pschyska"
     gpgkey: "https://copr-be.cloud.fedoraproject.org/results/pschyska/alacritty/pubkey.gpg"
     state: present

@@ -82,3 +82,32 @@
   become: true
   tags:
     - code
+
+# Lynis
+- name: Lynis block
+  block:
+    - name: add lynis repos
+      yum_repository:
+        name: "lynis"
+        baseurl: "https://packages.cisofy.com/community/lynis/rpm/"
+        description: "CISOfy Software - Lynis package"
+        gpgkey: "https://packages.cisofy.com/keys/cisofy-software-rpms-public.key"
+        state: present
+        gpgcheck: true
+        enabled: true
+
+    - name: install lynis
+      dnf:
+        name:
+          - lynis
+        state: latest
+  become: true
+  tags:
+    - lynis
+
+# Rkhunter
+- name: install rkhunter
+  dnf:
+    name:
+      - rkhunter
+    state: latest

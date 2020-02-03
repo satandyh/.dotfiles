@@ -31,6 +31,8 @@ For this moment it has:
   - tuning some parameters
     - fonts
     - tuned
+    - lynis
+    - rkhunter
   - OS configs
 - alacritty (terminal emulator)
 - vim
