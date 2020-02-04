@@ -111,3 +111,6 @@
     name:
       - rkhunter
     state: latest
+  become: true
+  tags:
+    - rkhunter
