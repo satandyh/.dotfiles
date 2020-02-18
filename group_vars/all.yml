@@ -4,4 +4,4 @@ ansible_connection: local
 ansible_become_exe: "sudo -i"
 
 base_distr: "fedora"
-base_distr_release: "rawhide"
+base_distr_release: "31"

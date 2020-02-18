@@ -5,6 +5,7 @@
     - common
     - alacritty
     - tmux
+    - zsh
 
 - name: Deploy environment for root user too
   hosts: all
@@ -12,3 +13,4 @@
   roles:
     - alacritty
     - tmux
+    - zsh

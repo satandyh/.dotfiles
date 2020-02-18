@@ -1,0 +1,69 @@
+---
+# Zsh
+- name: install zsh and dependencies
+  dnf:
+    name:
+      - zsh
+      - util-linux-user
+    state: latest
+  become: true
+  tags:
+    - zsh
+
+- name: check presence oh-my-zsh
+  stat:
+    path: "~/.oh-my-zsh"
+  register: oh_my_zsh_dir
+
+- name: download and install oh-my-zsh if it were not installed before
+  block:
+    - name: create temp dir for oh-my-zsh
+      tempfile:
+        state: directory
+        suffix: zsh_temp
+      register: zsh_temp
+    - name: download oh-my-zsh install file
+      get_url:
+        url: https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh
+        dest: "{{ zsh_temp.path }}/install.sh"
+        mode: 0755
+    - name: start install oh-my-zsh
+      command:
+        cmd: "{{ zsh_temp.path }}/install.sh --unattended"
+    - name: remove temp dir
+      file:
+        path: "{{ zsh_temp.path }}"
+        state: absent
+      when: zsh_temp.path is defined
+  when: oh_my_zsh_dir.stat.isdir is not defined
+
+- name: install/update zsh-autosuggestions plugin
+  git:
+    repo: "https://github.com/zsh-users/zsh-autosuggestions.git"
+    dest: "~/.oh-my-zsh/custom/plugins/zsh-autosuggestions"
+
+- name: install/update zsh-syntax-highlighting plugin
+  git:
+    repo: "https://github.com/zsh-users/zsh-syntax-highlighting.git"
+    dest: "~/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting"
+
+- name: install/update command-time plugin
+  git:
+    repo: "https://github.com/popstas/zsh-command-time.git"
+    dest: "~/.oh-my-zsh/custom/plugins/command-time"
+
+- name: change zsh theme
+  lineinfile:
+    path: "~/.zshrc"
+    regexp: "^ZSH_THEME="
+    line: 'ZSH_THEME="agnoster"'
+
+- name: change zsh plugins
+  lineinfile:
+    path: "~/.zshrc"
+    regexp: "^plugins="
+    line: "plugins=(git docker tmux zsh-autosuggestions zsh-syntax-highlighting command-time)"
+
+- name: change zsh to default shell
+  command:
+    cmd: "chsh -s /usr/bin/zsh"
