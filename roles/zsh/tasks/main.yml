@@ -47,6 +47,11 @@
     repo: "https://github.com/zsh-users/zsh-syntax-highlighting.git"
     dest: "~/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting"
 
+- name: install/update zsh-completions plugin
+  git:
+    repo: "https://github.com/zsh-users/zsh-completions.git"
+    dest: "~/.oh-my-zsh/custom/plugins/zsh-completions"
+
 - name: install/update command-time plugin
   git:
     repo: "https://github.com/popstas/zsh-command-time.git"
@@ -62,7 +67,7 @@
   lineinfile:
     path: "~/.zshrc"
     regexp: "^plugins="
-    line: "plugins=(git docker tmux zsh-autosuggestions zsh-syntax-highlighting command-time)"
+    line: "plugins=(git docker tmux zsh-autosuggestions zsh-syntax-highlighting zsh-completions command-time)"
 
 - name: change zsh to default shell
   command:
