@@ -3,7 +3,7 @@
   hosts: all
   roles:
     - common
-    - alacritty
+    #- alacritty
     - tmux
     - zsh
 
@@ -11,6 +11,6 @@
   hosts: all
   become: true
   roles:
-    - alacritty
+    #- alacritty
     - tmux
     - zsh

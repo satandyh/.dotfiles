@@ -4,4 +4,7 @@ ansible_connection: local
 ansible_become_exe: "sudo -i"
 
 base_distr: "fedora"
-base_distr_release: "31"
+base_distr_release: "33"
+
+git.name: ""
+git.email: ""

@@ -27,9 +27,11 @@
         url: https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh
         dest: "{{ zsh_temp.path }}/install.sh"
         mode: 0755
+      when: zsh_temp.path is defined
     - name: start install oh-my-zsh
       command:
         cmd: "{{ zsh_temp.path }}/install.sh --unattended"
+      when: zsh_temp.path is defined
     - name: remove temp dir
       file:
         path: "{{ zsh_temp.path }}"
@@ -72,3 +74,5 @@
 - name: change zsh to default shell
   command:
     cmd: "chsh -s /usr/bin/zsh"
+# TODO
+# add state if for get password

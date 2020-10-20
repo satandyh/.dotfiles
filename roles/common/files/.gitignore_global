@@ -1,5 +1,5 @@
 ################
-# for vim 
+# for vim
 # from https://github.com/github/gitignore/blob/master/Global/Vim.gitignore
 ################
 # Swap
@@ -25,3 +25,5 @@ tags
 ################
 *.retry
 ################
+# VSCode
+.vscode

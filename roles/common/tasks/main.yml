@@ -36,7 +36,11 @@
 
 - name: pass git config
   command:
-    cmd: "git config --global core.excludesfile ~/.gitignore_global"
+    cmd: "git config --global {{ item }}"
+  loop:
+    - "core.excludesfile ~/.gitignore_global"
+    - "user.name {{ git.name }}"
+    - "user.email {{ git.email }}"
   tags:
     - git
 
