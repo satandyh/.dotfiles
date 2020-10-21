@@ -118,3 +118,13 @@
   become: true
   tags:
     - rkhunter
+
+# Sysctl
+- name: copy sysctl.conf files
+  block:
+    copy:
+      src: "10-custom-tune.conf"
+      dest: "/sysctl.d/10-custom-tune.conf"
+  become: true
+  tags:
+    - sysctl
