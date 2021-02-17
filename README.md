@@ -55,3 +55,7 @@ maybe add fzf?
 2. copy .vimrc file to `~/.vimrc`
 3. run `:PluginInstall` inside vim
 4. do the same for all users
+
+# TODO
+
+- Add flameshot
