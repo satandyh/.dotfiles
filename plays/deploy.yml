@@ -6,7 +6,7 @@
     - role: alacritty
     - role: starship
     - role: tmux
-    # - zsh
+    - role: zsh
 
 - name: Deploy for root
   hosts: all
@@ -15,4 +15,4 @@
     - role: alacritty
     - role: starship
     - role: tmux
-    # - zsh
+    - role: zsh

@@ -1,78 +1,98 @@
 ---
-# Zsh
-- name: install zsh and dependencies
-  dnf:
+- name: Install zsh # noqa: package-latest
+  ansible.builtin.package:
     name:
       - zsh
       - util-linux-user
+      - fzf
     state: latest
   become: true
   tags:
     - zsh
 
-- name: check presence oh-my-zsh
-  stat:
+- name: Check presence oh-my-zsh
+  ansible.builtin.stat:
     path: "~/.oh-my-zsh"
   register: oh_my_zsh_dir
+  tags:
+    - zsh
 
-- name: download and install oh-my-zsh if it were not installed before
+- name: Download and install oh-my-zsh if it were not installed before
   block:
-    - name: create temp dir for oh-my-zsh
-      tempfile:
+    - name: Create temp dir for oh-my-zsh
+      ansible.builtin.tempfile:
         state: directory
         suffix: zsh_temp
       register: zsh_temp
-    - name: download oh-my-zsh install file
-      get_url:
+    - name: Download oh-my-zsh install file
+      ansible.builtin.get_url:
         url: https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh
         dest: "{{ zsh_temp.path }}/install.sh"
-        mode: 0755
+        mode: "0750"
       when: zsh_temp.path is defined
-    - name: start install oh-my-zsh
-      command:
+    - name: Start install oh-my-zsh
+      ansible.builtin.command:
         cmd: "{{ zsh_temp.path }}/install.sh --unattended"
+      changed_when: false
       when: zsh_temp.path is defined
-    - name: remove temp dir
-      file:
+    - name: Remove temp dir
+      ansible.builtin.file:
         path: "{{ zsh_temp.path }}"
         state: absent
       when: zsh_temp.path is defined
   when: oh_my_zsh_dir.stat.isdir is not defined
+  tags:
+    - zsh
 
-- name: install/update zsh-autosuggestions plugin
-  git:
+- name: Install/update zsh-autosuggestions plugin # noqa: latest[git]
+  ansible.builtin.git:
     repo: "https://github.com/zsh-users/zsh-autosuggestions.git"
-    dest: "~/.oh-my-zsh/custom/plugins/zsh-autosuggestions"
+    dest: "{{ ansible_user_dir }}/.oh-my-zsh/custom/plugins/zsh-autosuggestions"
+    update: true
+    force: true
+  tags:
+    - zsh
 
-- name: install/update zsh-syntax-highlighting plugin
-  git:
+- name: Install/update zsh-syntax-highlighting plugin # noqa: latest[git]
+  ansible.builtin.git:
     repo: "https://github.com/zsh-users/zsh-syntax-highlighting.git"
-    dest: "~/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting"
+    dest: "{{ ansible_user_dir }}/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting"
+    update: true
+    force: true
+  tags:
+    - zsh
 
-- name: install/update zsh-completions plugin
-  git:
+- name: Install/update zsh-completions plugin # noqa: latest[git]
+  ansible.builtin.git:
     repo: "https://github.com/zsh-users/zsh-completions.git"
-    dest: "~/.oh-my-zsh/custom/plugins/zsh-completions"
+    dest: "{{ ansible_user_dir }}/.oh-my-zsh/custom/plugins/zsh-completions"
+    update: true
+    force: true
+  tags:
+    - zsh
 
-- name: install/update command-time plugin
-  git:
-    repo: "https://github.com/popstas/zsh-command-time.git"
-    dest: "~/.oh-my-zsh/custom/plugins/command-time"
+- name: Install/update fzf-tab plugin # noqa: latest[git]
+  ansible.builtin.git:
+    repo: "https://github.com/Aloxaf/fzf-tab.git"
+    dest: "{{ ansible_user_dir }}/.oh-my-zsh/custom/plugins/fzf-tab"
+    update: true
+    force: true
+  tags:
+    - zsh
 
-- name: change zsh theme
-  lineinfile:
-    path: "~/.zshrc"
-    regexp: "^ZSH_THEME="
-    line: 'ZSH_THEME="agnoster"'
+- name: Copy zsh config
+  ansible.builtin.template:
+    src: ".zshrc"
+    dest: "{{ ansible_user_dir }}/.zshrc"
+    mode: "0750"
+    owner: "{{ ansible_user_id }}"
+    group: "{{ ansible_user_id }}"
+  tags:
+    - zsh
 
-- name: change zsh plugins
-  lineinfile:
-    path: "~/.zshrc"
-    regexp: "^plugins="
-    line: "plugins=(git docker tmux zsh-autosuggestions zsh-syntax-highlighting zsh-completions command-time)"
-
-- name: change zsh to default shell
-  command:
-    cmd: "chsh -s /usr/bin/zsh"
-# TODO
-# add state if for get password
+- name: Change zsh to default shell
+  ansible.builtin.user:
+    name: "{{ ansible_user_id }}"
+    shell: /usr/bin/zsh
+  tags:
+    - zsh

@@ -18,3 +18,19 @@
     - starship.toml
   tags:
     - starship
+
+- name: Activate prompt zsh
+  ansible.builtin.lineinfile:
+    path: "{{ ansible_user_dir }}/.zshrc"
+    line: 'eval "$(starship init zsh)"'
+  when: ansible_user_shell == "/usr/bin/zsh"
+  tags:
+    - starship
+
+- name: Activate prompt bash
+  ansible.builtin.lineinfile:
+    path: "{{ ansible_user_dir }}/.bashrc"
+    line: 'eval "$(starship init bash)"'
+  when: ansible_user_shell == "/usr/bin/bash"
+  tags:
+    - starship
