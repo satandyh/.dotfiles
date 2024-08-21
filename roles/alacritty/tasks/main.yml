@@ -4,7 +4,6 @@
     name: alacritty
     state: latest
   become: true
-#  when: ansible_distribution == "Fedora"
   tags:
     - alacritty
 

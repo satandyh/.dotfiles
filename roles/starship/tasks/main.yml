@@ -4,7 +4,6 @@
     name: starship
     state: latest
   become: true
-#  when: ansible_distribution == "Fedora"
   tags:
     - starship
 

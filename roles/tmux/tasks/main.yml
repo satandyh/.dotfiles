@@ -1,25 +1,27 @@
 ---
-# Tmux
-- name: install tmux
-  dnf:
+- name: Install tmux # noqa: package-latest
+  ansible.builtin.package:
     name:
       - tmux
       - xsel
-    state: present
+    state: latest
   become: true
   tags:
     - tmux
 
-- name: create dir for tpm (tmux plugin manager)
-  file:
+- name: Create dir for tpm (tmux plugin manager)
+  ansible.builtin.file:
     path: "~/.tmux/plugins/tpm"
     state: directory
+    mode: "0750"
+    owner: "{{ ansible_user_id }}"
+    group: "{{ ansible_user_id }}"
     recurse: true
   tags:
     - tmux
 
-- name: copy tpm (tmux plugin manager)
-  git:
+- name: Copy tpm (tmux plugin manager) # noqa: latest[git]
+  ansible.builtin.git:
     clone: true
     repo: "https://github.com/tmux-plugins/tpm.git"
     dest: "~/.tmux/plugins/tpm"
@@ -27,9 +29,19 @@
   tags:
     - tmux
 
-- name: copy tmux config
-  copy:
+- name: Copy tmux config
+  ansible.builtin.template:
     src: ".tmux.conf"
     dest: "~/.tmux.conf"
+    mode: "0750"
+    owner: "{{ ansible_user_id }}"
+    group: "{{ ansible_user_id }}"
+  tags:
+    - tmux
+
+- name: Run Install tmux plugins
+  ansible.builtin.shell: |
+    ~/.tmux/plugins/tpm/scripts/install_plugins.sh
+  changed_when: false
   tags:
     - tmux
