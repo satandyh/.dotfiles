@@ -1,37 +1,18 @@
 ---
-# Vim
-- name: install vim
-  dnf:
-    name:
-      - vim
-    state: present
+- name: Install vim # noqa: package-latest
+  ansible.builtin.package:
+    name: vim
+    state: latest
   become: true
   tags:
     - vim
 
-- name: create dir for tpm (tmux plugin manager)
-  file:
-    path: "~/.tmux/plugins/tpm"
-    state: directory
-    recurse: true
-  tags:
-    - vim
-
-- name: copy tpm (tmux plugin manager)
-  git:
-    clone: true
-    repo: "https://github.com/tmux-plugins/tpm.git"
-    dest: "~/.tmux/plugins/tpm"
-    update: true
-  tags:
-    - vim
-
-- name: copy vim config
-  copy:
+- name: Copy vim config
+  ansible.builtin.template:
     src: ".vimrc"
-    dest: "~/.vimrc"
+    dest: "{{ ansible_user_dir }}/.vimrc"
+    mode: "0640"
+    owner: "{{ ansible_user_id }}"
+    group: "{{ ansible_user_id }}"
   tags:
     - vim
-
-- name: install plugins
-- name: apply plugins

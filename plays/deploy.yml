@@ -7,6 +7,7 @@
     - role: starship
     - role: tmux
     - role: zsh
+    - role: vim
 
 - name: Deploy for root
   hosts: all
@@ -16,3 +17,4 @@
     - role: starship
     - role: tmux
     - role: zsh
+    - role: vim
