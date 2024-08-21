@@ -1,0 +1,35 @@
+import = ["{{ ansible_user_dir }}/.config/alacritty/material_theme_mod.toml"]
+
+[cursor]
+blink_interval = 750
+thickness = 0.15
+unfocused_hollow = true
+vi_mode_style = "None"
+
+[cursor.style]
+blinking = "Always"
+shape = "Block"
+
+[env]
+TERM = "alacritty"
+
+[font]
+size = 10.0
+
+[font.bold]
+family = "Fira Code Retina"
+style = "Bold"
+
+[font.bold_italic]
+family = "Fira Code Retina"
+style = "Bold Italic"
+
+[font.italic]
+family = "Fira Code Retina"
+style = "Italic"
+
+[font.normal]
+family = "Fira Code Retina"
+
+[window]
+opacity = 0.9

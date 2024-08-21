@@ -1,5 +1,5 @@
 set nocompatible              " be iMproved, required
-set shell=/usr/bin/bash
+set shell=/usr/bin/zsh
 filetype off                  " required
 " ==== some configurations
 set number

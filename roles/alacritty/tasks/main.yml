@@ -1,37 +1,32 @@
 ---
-# Alacritty
-- name: check repo
-  yum_repository:
-    name: "alacritty"
-    baseurl: "https://copr-be.cloud.fedoraproject.org/results/pschyska/alacritty/fedora-{{ base_distr_release }}-$basearch/"
-    description: "Copr repo for alacritty owned by pschyska"
-    gpgkey: "https://copr-be.cloud.fedoraproject.org/results/pschyska/alacritty/pubkey.gpg"
-    state: present
-    gpgcheck: true
-    enabled: true
-  become: true
-  tags:
-    - alacritty
-
-- name: install alacritty
-  dnf:
+- name: Install alacritty # noqa: package-latest
+  ansible.builtin.package:
     name: alacritty
     state: latest
   become: true
+#  when: ansible_distribution == "Fedora"
   tags:
     - alacritty
 
-- name: create config directory
-  file:
-    path: "~/.config/alacritty"
+- name: Create config directory
+  ansible.builtin.file:
+    path: "{{ ansible_user_dir }}/.config/alacritty"
     state: directory
-    recurse: true
+    mode: "0750"
+    owner: "{{ ansible_user_id }}"
+    group: "{{ ansible_user_id }}"
   tags:
     - alacritty
 
-- name: copy config
-  copy:
-    src: alacritty.yml
-    dest: "~/.config/alacritty/alacritty.yml"
+- name: Copy configs
+  ansible.builtin.template:
+    src: "{{ item }}"
+    dest: "{{ ansible_user_dir }}/.config/alacritty/{{ item }}"
+    mode: "0640"
+    owner: "{{ ansible_user_id }}"
+    group: "{{ ansible_user_id }}"
+  loop:
+    - alacritty.toml
+    - material_theme_mod.toml
   tags:
     - alacritty

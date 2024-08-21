@@ -1,0 +1,37 @@
+---
+# Vim
+- name: install vim
+  dnf:
+    name:
+      - vim
+    state: present
+  become: true
+  tags:
+    - vim
+
+- name: create dir for tpm (tmux plugin manager)
+  file:
+    path: "~/.tmux/plugins/tpm"
+    state: directory
+    recurse: true
+  tags:
+    - vim
+
+- name: copy tpm (tmux plugin manager)
+  git:
+    clone: true
+    repo: "https://github.com/tmux-plugins/tpm.git"
+    dest: "~/.tmux/plugins/tpm"
+    update: true
+  tags:
+    - vim
+
+- name: copy vim config
+  copy:
+    src: ".vimrc"
+    dest: "~/.vimrc"
+  tags:
+    - vim
+
+- name: install plugins
+- name: apply plugins

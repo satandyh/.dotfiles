@@ -1,0 +1,6 @@
+ansible.log
+.prettierignore
+.vscode
+.env
+.ansible-vault
+ansible.log
