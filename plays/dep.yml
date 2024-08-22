@@ -2,7 +2,7 @@
 - name: Deploy regular user
   hosts: all
   roles:
-    # - common
+    - role: common
     - role: alacritty
     - role: starship
     - role: tmux

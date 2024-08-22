@@ -1,44 +1,42 @@
 ---
-# Install system necessary components
-
 # Fonts: Fira Code and Fira Sans
-- name: Fonts block
-  block:
-    - name: add font repos
-      yum_repository:
-        name: "evana-fira-code-fonts"
-        baseurl: "https://copr-be.cloud.fedoraproject.org/results/evana/fira-code-fonts/fedora-{{ base_distr_release }}-$basearch/"
-        description: "Copr repo for fira-code-fonts owned by evana"
-        gpgkey: "https://copr-be.cloud.fedoraproject.org/results/evana/fira-code-fonts/pubkey.gpg"
-        state: present
-        gpgcheck: true
-        enabled: true
-
-    - name: install fonts
-      dnf:
-        name:
-          - fira-code-fonts
-          - mozilla-fira-fonts-common
-          - mozilla-fira-mono-fonts
-          - mozilla-fira-sans-fonts
-        state: latest
+- name: Install fonts # noqa: package-latest
+  ansible.builtin.package:
+    name:
+      - fira-code-fonts
+      - mozilla-fira-fonts-common
+      - mozilla-fira-mono-fonts
+      - mozilla-fira-sans-fonts
+    state: latest
   become: true
   tags:
     - fonts
 
 # Git ignore file
-- name: copy git ignore file
-  copy:
-    src: ".gitignore_global"
-    dest: "~/.gitignore_global"
+- name: Install git # noqa: package-latest
+  ansible.builtin.package:
+    name: git
+    state: latest
+  become: true
   tags:
     - git
 
-- name: pass git config
-  command:
-    cmd: "git config --global {{ item }}"
+- name: Copy git ignore file
+  ansible.builtin.template:
+    src: ".gitignore_global"
+    dest: "{{ ansible_user_dir }}/.gitignore_global"
+    mode: "0640"
+    owner: "{{ ansible_user_id }}"
+    group: "{{ ansible_user_id }}"
+  tags:
+    - git
+
+- name: Pass git config # noqa: command-instead-of-module
+  ansible.builtin.shell: |
+    git config --global {{ item }}
+  changed_when: false
   loop:
-    - "core.excludesfile ~/.gitignore_global"
+    - "core.excludesfile {{ ansible_user_dir }}/.gitignore_global"
     - "user.name {{ git.name }}"
     - "user.email {{ git.email }}"
   tags:
@@ -47,84 +45,85 @@
 # Tuned
 - name: Tuned block
   block:
-    - name: install tuned
-      dnf:
+    - name: Install tuned # noqa: package-latest
+      ansible.builtin.package:
         name: tuned
         state: latest
-
-    - name: config tuned
-      command:
-        cmd: tuned-adm profile balanced
-
-    - name: enable tuned
-      service:
-        name: "tuned"
+    - name: Config tuned
+      ansible.builtin.shell: |
+        tuned-adm profile balanced
+      changed_when: false
+    - name: Enable tuned
+      ansible.builtin.service:
+        name: tuned
         enabled: true
-        state: "restarted"
+        state: started
   become: true
   tags:
     - tuned
-
-# VS code
-- name: VScode block
-  block:
-    - name: add code repos
-      yum_repository:
-        name: "code"
-        baseurl: "https://packages.microsoft.com/yumrepos/vscode"
-        description: "Visual Studio Code"
-        gpgkey: "https://packages.microsoft.com/keys/microsoft.asc"
-        state: present
-        gpgcheck: true
-        enabled: true
-
-    - name: install code
-      dnf:
-        name:
-          - code
-        state: latest
-  become: true
-  tags:
-    - code
-
-# Lynis
-- name: Lynis block
-  block:
-    - name: add lynis repos
-      yum_repository:
-        name: "lynis"
-        baseurl: "https://packages.cisofy.com/community/lynis/rpm/"
-        description: "CISOfy Software - Lynis package"
-        gpgkey: "https://packages.cisofy.com/keys/cisofy-software-rpms-public.key"
-        state: present
-        gpgcheck: true
-        enabled: true
-
-    - name: install lynis
-      dnf:
-        name:
-          - lynis
-        state: latest
-  become: true
-  tags:
-    - lynis
-
-# Rkhunter
-- name: install rkhunter
-  dnf:
-    name:
-      - rkhunter
-    state: latest
-  become: true
-  tags:
-    - rkhunter
+#
+## VS code
+# - name: VScode block
+#  block:
+#    - name: add code repos
+#      yum_repository:
+#        name: "code"
+#        baseurl: "https://packages.microsoft.com/yumrepos/vscode"
+#        description: "Visual Studio Code"
+#        gpgkey: "https://packages.microsoft.com/keys/microsoft.asc"
+#        state: present
+#        gpgcheck: true
+#        enabled: true
+#
+#    - name: install code
+#      dnf:
+#        name:
+#          - code
+#        state: latest
+#  become: true
+#  tags:
+#    - code
+#
+## Lynis
+# - name: Lynis block
+#  block:
+#    - name: add lynis repos
+#      yum_repository:
+#        name: "lynis"
+#        baseurl: "https://packages.cisofy.com/community/lynis/rpm/"
+#        description: "CISOfy Software - Lynis package"
+#        gpgkey: "https://packages.cisofy.com/keys/cisofy-software-rpms-public.key"
+#        state: present
+#        gpgcheck: true
+#        enabled: true
+#
+#    - name: install lynis
+#      dnf:
+#        name:
+#          - lynis
+#        state: latest
+#  become: true
+#  tags:
+#    - lynis
+#
+## Rkhunter
+# - name: install rkhunter
+#  dnf:
+#    name:
+#      - rkhunter
+#    state: latest
+#  become: true
+#  tags:
+#    - rkhunter
 
 # Sysctl
-- name: copy sysctl.conf files
-  block:
-    copy:
-      src: "10-custom-tune.conf"
-      dest: "/sysctl.d/10-custom-tune.conf"
+- name: Copy sysctl.conf
+  ansible.builtin.template:
+    src: "10-custom-tune.conf"
+    dest: "/etc/sysctl.d/10-custom-tune.conf"
+    mode: "0640"
+    owner: "{{ ansible_user_id }}"
+    group: "{{ ansible_user_id }}"
   become: true
   tags:
     - sysctl
