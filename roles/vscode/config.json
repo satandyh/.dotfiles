@@ -1,0 +1,177 @@
+{
+  "telemetry.enableTelemetry": false,
+  "telemetry.enableCrashReporter": false,
+  "editor.fontFamily": "'Fira Code Medium', 'monospace', monospace, 'Fira Code Medium'",
+  "go.autocompleteUnimportedPackages": true,
+  "diffEditor.renderSideBySide": true,
+  "explorer.confirmDragAndDrop": false,
+  "explorer.confirmDelete": false,
+  "markdownlint.config": {
+    "MD022": false,
+    "MD024": false,
+    "MD025": false
+  },
+  "[go]": {
+    "editor.insertSpaces": true,
+    "editor.tabSize": 2,
+    "editor.formatOnSave": true
+  },
+  "go.lintTool": "golangci-lint",
+  "go.docsTool": "guru",
+  "go.useLanguageServer": true,
+  "yaml.customTags": ["!vault"],
+  "yaml.format.enable": true,
+  "json.schemas": [
+    //"http://json.schemastore.org/ansible-stable-2.7": "**/tasks/*.yml"
+    {
+      "name": "Ansible Role",
+      "description": "Ansible role task files",
+      "url": "https://json.schemastore.org/ansible-role-2.9",
+      "fileMatch": ["**/tasks/*.yml", "**/tasks/*.yaml"],
+      "versions": {
+        "2.0": "https://json.schemastore.org/ansible-role-2.0",
+        "2.1": "https://json.schemastore.org/ansible-role-2.1",
+        "2.2": "https://json.schemastore.org/ansible-role-2.2",
+        "2.3": "https://json.schemastore.org/ansible-role-2.3",
+        "2.4": "https://json.schemastore.org/ansible-role-2.4",
+        "2.5": "https://json.schemastore.org/ansible-role-2.5",
+        "2.6": "https://json.schemastore.org/ansible-role-2.6",
+        "2.7": "https://json.schemastore.org/ansible-role-2.7",
+        "2.9": "https://json.schemastore.org/ansible-role-2.9"
+      }
+    },
+    {
+      "name": "Ansible Playbook",
+      "description": "Ansible playbook files",
+      "url": "https://json.schemastore.org/ansible-playbook",
+      "fileMatch": [
+        "**/playbook/*.yaml",
+        "**/playbook/*.yml",
+        "**/play/*.yml",
+        "**/play/*.yaml",
+        "**/plays/*.yml",
+        "**/plays/*.yaml",
+        "playbook.yml",
+        "playbook.yaml"
+      ]
+    },
+    {
+      "name": "Ansible Inventory",
+      "description": "Ansible inventory files",
+      "url": "https://json.schemastore.org/ansible-inventory",
+      "fileMatch": [
+        "**/inventory/*.yaml",
+        "**/inventory/*.yml",
+        "inventory.yml",
+        "inventory.yaml"
+      ]
+    },
+    {
+      "name": "Ansible Collection Galaxy",
+      "description": "Ansible Collection Galaxy metadata",
+      "url": "https://json.schemastore.org/ansible-collection-galaxy",
+      "fileMatch": ["galaxy.yml", "galaxy.yaml"]
+    }
+  ],
+  "workbench.iconTheme": "material-icon-theme",
+  "editor.fontLigatures": true,
+  "editor.formatOnPaste": true,
+  //"editor.multiCursorModifier": "altCmd",
+  "editor.multiCursorModifier": "ctrlCmd",
+  "files.trimFinalNewlines": true,
+  "editor.renderWhitespace": "all",
+  "sync.autoDownload": true,
+  "[markdown]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "files.associations": {
+    "[Dd]ockerfile*": "dockerfile",
+    "[Dd]ocker-compose-*.yml": "docker-compose"
+  },
+  "sync.autoUpload": true,
+  "sync.quietSync": true,
+  "[yaml]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "terraform.telemetry.enabled": false,
+  "git.alwaysShowStagedChangesResourceGroup": true,
+  "terraform.languageServer": {
+    "external": true,
+    "pathToBinary": "/usr/local/bin",
+    "args": [],
+    "maxNumberOfProblems": 100,
+    "trace.server": "off"
+  },
+  "go.formatTool": "gofmt",
+  //"rust-client.trace.server": "verbose",
+  //"rust-client.updateOnStartup": true,
+  //"rust-analyzer.path": "~/.config/Code/User/globalStorage/matklad.rust-analyzer",
+  //"rust-analyzer.trace.extension": true,
+  //"rust-analyzer.trace.server": "verbose",
+  "gitlens.views.repositories.showBranchComparison": false,
+  "[jsonc]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "lldb.launch.cwd": "${fileDirname}",
+  "lldb.verboseLogging": true,
+  "projectManager.git.baseFolders": [
+    "$home/git",
+    "$home/git_1win",
+    "$home/github"
+  ],
+  "projectManager.git.maxDepthRecursion": 8,
+  "git.confirmSync": false,
+  "[json]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "remote.containers.dockerPath": "podman",
+  "window.menuBarVisibility": "visible",
+  "files.exclude": {
+    "**/.git": false
+  },
+  "editor.renderControlCharacters": true,
+  "rust-client.trace.server": "verbose",
+  "debug.allowBreakpointsEverywhere": true,
+  "[dockerfile]": {
+    "editor.defaultFormatter": "foxundermoon.shell-format"
+  },
+  "gitlens.advanced.blame.customArguments": [],
+  "yaml.format.printWidth": 120,
+  "editor.formatOnType": true,
+  "diffEditor.codeLens": true,
+  "terminal.explorerKind": "external",
+  "python.showStartPage": false,
+  "deepcode.advancedMode": true,
+  "deepcode.yesCrashReport": false,
+  "deepcode.yesTelemetry": false,
+  "deepcode.yesWelcomeNotification": false,
+  "deepcode.uploadApproved": true,
+  "workbench.editorAssociations": {
+    "*.ipynb": "jupyter-notebook"
+  },
+  "workbench.colorCustomizations": {
+    "editorRuler.foreground": "#3f0e1e"
+  },
+  "notebook.cellToolbarLocation": {
+    "default": "right",
+    "jupyter-notebook": "left"
+  },
+  "json.maxItemsComputed": 50000,
+  "go.toolsManagement.autoUpdate": true,
+  "go.useCodeSnippetsOnFunctionSuggest": true,
+  "go.useCodeSnippetsOnFunctionSuggestWithoutType": true,
+  "telemetry.telemetryLevel": "off",
+  "redhat.telemetry.enabled": false,
+  "diffEditor.ignoreTrimWhitespace": false,
+  "[rust]": {
+    "editor.tabSize": 2
+  },
+  "settingsSync.ignoredExtensions": [],
+  "editor.rulers": [80, 120],
+  "gitlens.views.tags.files.layout": "list",
+  "projectManager.removeCurrentProjectFromList": false,
+  "projectManager.showParentFolderInfoOnDuplicates": true,
+  "projectManager.filterOnFullPath": true,
+  "extensions.ignoreRecommendations": true,
+  "github.copilot.editor.enableAutoCompletions": true
+}
