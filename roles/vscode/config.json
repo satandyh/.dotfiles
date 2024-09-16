@@ -21,58 +21,32 @@
   "go.useLanguageServer": true,
   "yaml.customTags": ["!vault"],
   "yaml.format.enable": true,
-  "json.schemas": [
-    //"http://json.schemastore.org/ansible-stable-2.7": "**/tasks/*.yml"
-    {
-      "name": "Ansible Role",
-      "description": "Ansible role task files",
-      "url": "https://json.schemastore.org/ansible-role-2.9",
-      "fileMatch": ["**/tasks/*.yml", "**/tasks/*.yaml"],
-      "versions": {
-        "2.0": "https://json.schemastore.org/ansible-role-2.0",
-        "2.1": "https://json.schemastore.org/ansible-role-2.1",
-        "2.2": "https://json.schemastore.org/ansible-role-2.2",
-        "2.3": "https://json.schemastore.org/ansible-role-2.3",
-        "2.4": "https://json.schemastore.org/ansible-role-2.4",
-        "2.5": "https://json.schemastore.org/ansible-role-2.5",
-        "2.6": "https://json.schemastore.org/ansible-role-2.6",
-        "2.7": "https://json.schemastore.org/ansible-role-2.7",
-        "2.9": "https://json.schemastore.org/ansible-role-2.9"
-      }
-    },
-    {
-      "name": "Ansible Playbook",
-      "description": "Ansible playbook files",
-      "url": "https://json.schemastore.org/ansible-playbook",
-      "fileMatch": [
-        "**/playbook/*.yaml",
-        "**/playbook/*.yml",
-        "**/play/*.yml",
-        "**/play/*.yaml",
-        "**/plays/*.yml",
-        "**/plays/*.yaml",
-        "playbook.yml",
-        "playbook.yaml"
-      ]
-    },
-    {
-      "name": "Ansible Inventory",
-      "description": "Ansible inventory files",
-      "url": "https://json.schemastore.org/ansible-inventory",
-      "fileMatch": [
-        "**/inventory/*.yaml",
-        "**/inventory/*.yml",
-        "inventory.yml",
-        "inventory.yaml"
-      ]
-    },
-    {
-      "name": "Ansible Collection Galaxy",
-      "description": "Ansible Collection Galaxy metadata",
-      "url": "https://json.schemastore.org/ansible-collection-galaxy",
-      "fileMatch": ["galaxy.yml", "galaxy.yaml"]
-    }
-  ],
+  "files.associations": {
+    // tasks
+    "**/tasks/*.yaml": "ansible",
+    "**/tasks/*.yml": "ansible",
+    // handlers
+    "**/handlers/*.yaml": "ansible",
+    "**/handlers/*.yml": "ansible",
+    // plays
+    "**/playbook/*.yaml": "ansible",
+    "**/playbook/*.yml": "ansible",
+    "**/play/*.yml": "ansible",
+    "**/play/*.yaml": "ansible",
+    "**/plays/*.yml": "ansible",
+    "**/plays/*.yaml": "ansible",
+    "playbook.yml": "ansible",
+    "playbook.yaml": "ansible",
+    "*plays.yml": "ansible",
+    // inventory
+    "**/inventory/*.yaml": "ansible",
+    "**/inventory/*.yml": "ansible",
+    "inventory.yml": "ansible",
+    "inventory.yaml": "ansible",
+    // galaxy
+    "galaxy.yml": "ansible",
+    "galaxy.yaml": "ansible"
+  },
   "workbench.iconTheme": "material-icon-theme",
   "editor.fontLigatures": true,
   "editor.formatOnPaste": true,
