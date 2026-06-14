@@ -6,12 +6,12 @@ This repository prepares a lightweight macOS development and management environm
 
 - Homebrew if missing.
 - CLI tools: `git`, `curl`, `htop`, `tmux`, `starship`, `fzf`, and zsh helper plugins.
-- Apps and fonts through Homebrew Cask: Ghostty, VS Code, Chrome, Google Drive, Yandex Disk, KeePassXC, Claude, Codex, Flameshot, and Fira Code Nerd Font.
+- Apps and fonts through Homebrew Cask: Ghostty, VS Code, Chrome, Google Drive, Yandex Disk, KeePassXC, Claude, Codex, Flameshot, and Fira Code.
 
 ## What It Configures
 
 - zsh history, completions, autosuggestions, syntax highlighting, fzf integration, and Starship prompt.
-- Ghostty with Fira Code, light transparency, padding, and a small dark color set.
+- Ghostty with Fira Code, light transparency, blur, and window state persistence.
 - Starship prompt using the existing repository style as a starting point.
 - Git global includes for default identity and GitHub-specific identity selected by remote URL.
 - Finder hidden files visibility.

@@ -12,7 +12,7 @@ brew "zsh-completions"
 brew "zsh-syntax-highlighting"
 
 # Fonts
-cask "font-fira-code-nerd-font"
+cask "font-fira-code"
 
 # Applications
 cask "ghostty"

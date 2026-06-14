@@ -1,0 +1,11 @@
+[include]
+    path = ~/.gitconfig-default
+
+[includeIf "hasconfig:remote.*.url:git@github.com:*"]
+    path = ~/.gitconfig-github
+
+[includeIf "hasconfig:remote.*.url:ssh://git@github.com/**"]
+    path = ~/.gitconfig-github
+
+[includeIf "hasconfig:remote.*.url:https://github.com/**"]
+    path = ~/.gitconfig-github

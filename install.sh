@@ -147,20 +147,9 @@ source "$HOME/.config/dotfiles/zsh/zshrc"
 }
 
 configure_git() {
+  install_file_safely "$REPO_ROOT/config/git/.gitconfig" "$HOME/.gitconfig" "global Git config"
   install_file_safely "$REPO_ROOT/config/git/.gitconfig-default" "$HOME/.gitconfig-default" "default Git identity"
   install_file_safely "$REPO_ROOT/config/git/.gitconfig-github" "$HOME/.gitconfig-github" "GitHub Git identity"
-
-  block='# >>> dotfiles git
-[include]
-    path = ~/.gitconfig-default
-[includeIf "hasconfig:remote.*.url:git@github.com:*"]
-    path = ~/.gitconfig-github
-[includeIf "hasconfig:remote.*.url:ssh://git@github.com/**"]
-    path = ~/.gitconfig-github
-[includeIf "hasconfig:remote.*.url:https://github.com/**"]
-    path = ~/.gitconfig-github
-# <<< dotfiles git'
-  ensure_managed_block "$HOME/.gitconfig" "~/.gitconfig" "$block" "# >>> dotfiles git"
 }
 
 configure_files() {

@@ -1,38 +1,89 @@
 format = """
 $username\
 $hostname\
+$localip\
+$shlvl\
+$singularity\
+$kubernetes\
 $directory\
+$vcsh\
 $git_branch\
+$git_commit\
+$git_state\
+$git_metrics\
 $git_status\
+$hg_branch\
+$docker_context\
 $package\
+$c\
+$cmake\
+$cobol\
+$daml\
+$dart\
+$deno\
+$dotnet\
+$elixir\
+$elm\
+$erlang\
+$golang\
+$haskell\
+$helm\
+$java\
+$julia\
+$kotlin\
+$lua\
+$nim\
 $nodejs\
+$ocaml\
+$perl\
+$php\
+$pulumi\
+$purescript\
 $python\
+$raku\
+$rlang\
+$red\
+$ruby\
+$rust\
+$scala\
+$swift\
+$terraform\
+$vlang\
+$vagrant\
+$zig\
+$buf\
+$nix_shell\
+$conda\
+$spack\
+$memory_usage\
+$env_var\
+$crystal\
+$custom\
+$sudo\
 $cmd_duration\
+$jobs\
+$battery\
 $time\
 $status\
+$container\
+$shell\
 $line_break\
 $character"""
 
 add_newline = false
 
 [directory]
+#fish_style_pwd_dir_length = 1
 truncate_to_repo = false
 
-[git_branch]
-format = "[$symbol$branch]($style) "
-
-[git_status]
-format = "([$all_status$ahead_behind]($style) )"
-
 [hostname]
-ssh_only = true
+ssh_only = false
 
 [username]
-show_always = false
+show_always = true
 
 [time]
 disabled = false
-format = "[$time]($style) "
 style = "black"
 
 [status]
