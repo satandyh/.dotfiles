@@ -15,6 +15,8 @@ Use GCCD for new tasks:
 
 Use `.codex/templates/gccd-brief.md` when a task needs a written brief.
 
+For implementation tasks, work in this order: write the mini-spec, define the test plan, add or update tests, make the code change, run the checks, then commit the completed change. Keep tests isolated from the real macOS environment.
+
 ## Boundaries
 
 Keep changes inside this repository unless the user explicitly approves otherwise. Do not run installers, package managers, provisioning scripts, macOS `defaults` writes, or commands that alter the host OS unless the user specifically asks to apply the setup. Do not push to remotes.

@@ -48,10 +48,10 @@ require_macos() {
 }
 
 brew_shellenv() {
-  if [ -x /opt/homebrew/bin/brew ]; then
-    eval "$(/opt/homebrew/bin/brew shellenv)"
-  elif command -v brew >/dev/null 2>&1; then
+  if command -v brew >/dev/null 2>&1; then
     eval "$(brew shellenv)"
+  elif [ -x /opt/homebrew/bin/brew ]; then
+    eval "$(/opt/homebrew/bin/brew shellenv)"
   fi
 }
 
@@ -185,14 +185,14 @@ write_manual_steps() {
 write_report() {
   {
     printf '# macOS Setup Report\n\n'
-    printf '- Done: %s\n' "$DONE_COUNT"
-    printf '- Skipped: %s\n' "$SKIP_COUNT"
-    printf '- Manual steps: %s\n\n' "$MANUAL_COUNT"
+    printf -- '- Done: %s\n' "$DONE_COUNT"
+    printf -- '- Skipped: %s\n' "$SKIP_COUNT"
+    printf -- '- Manual steps: %s\n\n' "$MANUAL_COUNT"
     printf '## Manual Steps\n\n'
     sed 's/^/- /' "$MANUAL_FILE"
     printf '\n## Notes\n\n'
-    printf '- Existing config files are never deleted.\n'
-    printf '- Differing config candidates are written under `%s`.\n' "$CANDIDATE_DIR"
+    printf -- '- Existing config files are never deleted.\n'
+    printf -- '- Differing config candidates are written under `%s`.\n' "$CANDIDATE_DIR"
   } > "$REPORT_FILE"
 
   log ""
