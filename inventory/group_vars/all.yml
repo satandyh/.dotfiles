@@ -1,6 +1,0 @@
----
-ansible_connection: local
-
-git:
-  name: ""
-  email: ""

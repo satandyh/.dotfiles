@@ -1,0 +1,43 @@
+# Managed by dotfiles. Sourced from ~/.zshrc.
+
+export FZF_DEFAULT_OPTS='--height 40% --layout=reverse --border'
+export GPG_TTY="$(tty)"
+export GNUPGHOME="$HOME/.gnupg"
+
+HISTFILE="${XDG_STATE_HOME:-$HOME/.local/state}/zsh/history"
+HISTSIZE=50000
+SAVEHIST=50000
+mkdir -p "$(dirname "$HISTFILE")"
+
+setopt append_history
+setopt extended_history
+setopt hist_ignore_all_dups
+setopt hist_ignore_space
+setopt hist_reduce_blanks
+setopt inc_append_history
+setopt share_history
+
+if command -v brew >/dev/null 2>&1; then
+  BREW_PREFIX="$(brew --prefix)"
+  FPATH="$BREW_PREFIX/share/zsh-completions:$FPATH"
+
+  if [ -r "$BREW_PREFIX/share/zsh-autosuggestions/zsh-autosuggestions.zsh" ]; then
+    source "$BREW_PREFIX/share/zsh-autosuggestions/zsh-autosuggestions.zsh"
+  fi
+fi
+
+autoload -Uz compinit
+mkdir -p "${XDG_CACHE_HOME:-$HOME/.cache}/zsh"
+compinit -d "${XDG_CACHE_HOME:-$HOME/.cache}/zsh/zcompdump"
+
+if command -v fzf >/dev/null 2>&1; then
+  source <(fzf --zsh)
+fi
+
+if command -v starship >/dev/null 2>&1; then
+  eval "$(starship init zsh)"
+fi
+
+if [ -n "${BREW_PREFIX:-}" ] && [ -r "$BREW_PREFIX/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" ]; then
+  source "$BREW_PREFIX/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
+fi

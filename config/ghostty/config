@@ -1,0 +1,15 @@
+font-family = "FiraCode Nerd Font"
+font-size = 12
+
+background = 1e1e2e
+foreground = cdd6f4
+selection-background = 585b70
+selection-foreground = cdd6f4
+
+background-opacity = 0.92
+background-blur = true
+
+window-padding-x = 8
+window-padding-y = 8
+window-save-state = always
+macos-option-as-alt = true

@@ -1,0 +1,40 @@
+format = """
+$username\
+$hostname\
+$directory\
+$git_branch\
+$git_status\
+$package\
+$nodejs\
+$python\
+$cmd_duration\
+$time\
+$status\
+$line_break\
+$character"""
+
+add_newline = false
+
+[directory]
+truncate_to_repo = false
+
+[git_branch]
+format = "[$symbol$branch]($style) "
+
+[git_status]
+format = "([$all_status$ahead_behind]($style) )"
+
+[hostname]
+ssh_only = true
+
+[username]
+show_always = false
+
+[time]
+disabled = false
+format = "[$time]($style) "
+style = "black"
+
+[status]
+disabled = false
+format = "[$status]($style) "

@@ -1,0 +1,15 @@
+[user]
+    name = John Doe
+    email = john.doe@example.com
+
+[init]
+    defaultBranch = main
+
+[pull]
+    rebase = false
+
+[push]
+    default = current
+
+[color]
+    ui = auto
