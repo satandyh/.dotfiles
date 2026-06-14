@@ -79,6 +79,9 @@ grep -F -- '- Skipped:' "$report" >/dev/null
 grep -F -- '- Manual steps:' "$report" >/dev/null
 grep -F '## Manual Steps' "$report" >/dev/null
 grep -F 'Report written to' <<< "$output" >/dev/null
+grep -F '# macOS Setup Report' <<< "$output" >/dev/null
+grep -F -- '- Done:' <<< "$output" >/dev/null
+grep -F '## Manual Steps' <<< "$output" >/dev/null
 test -f "$FAKE_HOME/.config/ghostty/config"
 test -f "$FAKE_HOME/.config/starship.toml"
 test -f "$FAKE_HOME/.config/dotfiles/zsh/zshrc"

@@ -197,6 +197,8 @@ write_report() {
 
   log ""
   log "Report written to $REPORT_FILE"
+  log ""
+  cat "$REPORT_FILE"
 }
 
 main() {
