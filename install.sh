@@ -12,9 +12,6 @@ DONE_COUNT=0
 SKIP_COUNT=0
 MANUAL_COUNT=0
 
-mkdir -p "$STATE_DIR" "$CANDIDATE_DIR"
-: > "$MANUAL_FILE"
-
 log() {
   printf '%s\n' "$*"
 }
@@ -55,6 +52,30 @@ brew_shellenv() {
   fi
 }
 
+preflight() {
+  missing=0
+
+  for path in \
+    "$REPO_ROOT/Brewfile" \
+    "$REPO_ROOT/config/ghostty/config" \
+    "$REPO_ROOT/config/starship/starship.toml" \
+    "$REPO_ROOT/config/zsh/zshrc" \
+    "$REPO_ROOT/config/git/.gitconfig" \
+    "$REPO_ROOT/config/git/.gitconfig-default" \
+    "$REPO_ROOT/config/git/.gitconfig-github"
+  do
+    if [ ! -r "$path" ]; then
+      log "Missing required file: $path"
+      missing=1
+    fi
+  done
+
+  if [ "$missing" -ne 0 ]; then
+    log "Preflight failed. No setup changes were applied."
+    exit 1
+  fi
+}
+
 print_plan() {
   log "Plan:"
   log "- Ensure Homebrew is installed."
@@ -75,6 +96,11 @@ confirm() {
     y|Y|yes|YES) ;;
     *) log "Canceled."; exit 0 ;;
   esac
+}
+
+init_state() {
+  mkdir -p "$STATE_DIR" "$CANDIDATE_DIR"
+  : > "$MANUAL_FILE"
 }
 
 ensure_homebrew() {
@@ -203,8 +229,10 @@ write_report() {
 
 main() {
   require_macos
+  preflight
   print_plan
   confirm
+  init_state
   ensure_homebrew
   install_brew_bundle
   configure_files

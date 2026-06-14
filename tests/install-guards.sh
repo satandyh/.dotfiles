@@ -92,7 +92,7 @@ prepare_case "cancel" "Darwin" "arm64"
 output="$(cd "$RUN_DIR" && printf 'n\n' | ./install.sh)"
 assert_contains "$output" "Canceled."
 test ! -f "$FAKE_HOME/.config/ghostty/config" || fail "cancel should not install config files"
-test -z "$(find "$RUN_DIR/state" -name 'report-*.md' -type f -print -quit)" || fail "cancel should not write report"
+test ! -d "$RUN_DIR/state" || fail "cancel should not initialize state files"
 
 prepare_case "linux" "Linux" "arm64"
 set +e
@@ -111,6 +111,18 @@ set -e
 test "$status" -ne 0 || fail "Intel Macs should be rejected"
 assert_contains "$output" "targets Apple Silicon Macs"
 test ! -f "$FAKE_HOME/.config/ghostty/config" || fail "architecture guard should stop before config writes"
+
+prepare_case "missing-source" "Darwin" "arm64"
+rm "$RUN_DIR/config/git/.gitconfig-github"
+set +e
+output="$(cd "$RUN_DIR" && printf 'y\n' | ./install.sh 2>&1)"
+status="$?"
+set -e
+test "$status" -ne 0 || fail "missing source file should fail preflight"
+assert_contains "$output" "Missing required file:"
+assert_contains "$output" "Preflight failed. No setup changes were applied."
+test ! -f "$FAKE_HOME/.config/ghostty/config" || fail "preflight should stop before config writes"
+test ! -d "$RUN_DIR/state" || fail "preflight should stop before state files are initialized"
 
 prepare_case "conflict" "Darwin" "arm64"
 mkdir -p "$FAKE_HOME/.config/ghostty"
