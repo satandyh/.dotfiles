@@ -93,6 +93,21 @@ SCRIPT
 esac
 EOF
 
+  cat > "$FAKE_BIN/mas" <<'EOF'
+#!/usr/bin/env bash
+case "${1:-}" in
+  list)
+    if [ -f "$HOME/.lang-switcher-installed" ]; then
+      printf '1597566195 Smart Language Switcher\n'
+    fi
+    ;;
+  install)
+    test "${2:-}" = "1597566195"
+    : > "$HOME/.lang-switcher-installed"
+    ;;
+esac
+EOF
+
   cat > "$FAKE_BIN/defaults" <<'EOF'
 #!/usr/bin/env bash
 if [ "${1:-}" = "read" ]; then
@@ -106,7 +121,7 @@ EOF
 exit 0
 EOF
 
-  chmod +x "$FAKE_BIN/uname" "$FAKE_BIN/brew" "$FAKE_BIN/git" "$FAKE_BIN/defaults" "$FAKE_BIN/killall"
+  chmod +x "$FAKE_BIN/uname" "$FAKE_BIN/brew" "$FAKE_BIN/git" "$FAKE_BIN/mas" "$FAKE_BIN/defaults" "$FAKE_BIN/killall"
 
   export HOME="$FAKE_HOME"
   export FAKE_BREW_PREFIX="$CASE_DIR/homebrew"

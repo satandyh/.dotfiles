@@ -5,8 +5,9 @@ This repository installs and configures a reproducible terminal environment for 
 ## What It Installs
 
 - Homebrew if missing.
-- CLI tools: `git`, `curl`, `htop`, `tmux`, `starship`, and `fzf`.
-- Apps and fonts through Homebrew Cask: Ghostty, VS Code, Chrome, Google Drive, Yandex Disk, KeePassXC, Claude, Codex, Flameshot, and Fira Code.
+- CLI tools: `git`, `curl`, `htop`, `mas`, `tmux`, `starship`, and `fzf`.
+- Apps and fonts through Homebrew Cask: Ghostty, VS Code, Chrome, Google Drive, Yandex Disk, KeePassXC, MacWhisper, Raycast, Claude, Codex, Flameshot, UTM, and Fira Code.
+- Lang Switcher through the Mac App Store, using `mas` when the current Apple ID session permits it.
 - Oh My Zsh and the autosuggestions, syntax-highlighting, and completions plugins.
 - TPM and the tmux sensible, resurrect, and yank plugins.
 
@@ -29,6 +30,8 @@ cd ~/git/.dotfiles && ./install.sh
 After the repository is downloaded, `./install.sh` is the single command that deploys the terminal. It prints a plan, asks for confirmation, installs dependencies in order, and writes a report under `state/`.
 
 Homebrew installs only missing Brewfile dependencies. Programs that are already present are kept as installed and are not upgraded automatically.
+
+Raycast, Lang Switcher, MacWhisper, and UTM are install-only in this iteration. Raycast settings and data export will be handled separately using Raycast's encrypted `.rayconfig` format.
 
 ## Safety
 

@@ -73,6 +73,21 @@ SCRIPT
 esac
 EOF
 
+cat > "$FAKE_BIN/mas" <<'EOF'
+#!/usr/bin/env bash
+case "${1:-}" in
+  list)
+    if [ -f "$HOME/.lang-switcher-installed" ]; then
+      printf '1597566195 Smart Language Switcher\n'
+    fi
+    ;;
+  install)
+    test "${2:-}" = "1597566195"
+    : > "$HOME/.lang-switcher-installed"
+    ;;
+esac
+EOF
+
 cat > "$FAKE_BIN/defaults" <<'EOF'
 #!/usr/bin/env bash
 if [ "${1:-}" = "read" ]; then
@@ -86,7 +101,7 @@ cat > "$FAKE_BIN/killall" <<'EOF'
 exit 0
 EOF
 
-chmod +x "$FAKE_BIN/uname" "$FAKE_BIN/brew" "$FAKE_BIN/git" "$FAKE_BIN/defaults" "$FAKE_BIN/killall"
+chmod +x "$FAKE_BIN/uname" "$FAKE_BIN/brew" "$FAKE_BIN/git" "$FAKE_BIN/mas" "$FAKE_BIN/defaults" "$FAKE_BIN/killall"
 
 export HOME="$FAKE_HOME"
 export FAKE_BREW_PREFIX="$WORK_DIR/homebrew"
@@ -124,16 +139,23 @@ test -d "$FAKE_HOME/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting/.git"
 test -d "$FAKE_HOME/.oh-my-zsh/custom/plugins/zsh-completions/.git"
 test -d "$FAKE_HOME/.tmux/plugins/tpm/.git"
 test -f "$FAKE_HOME/.tmux/plugins/.install-plugins-ran"
+test -f "$FAKE_HOME/.lang-switcher-installed"
 grep -F -- '--no-upgrade' "$FAKE_HOME/.brew-bundle-args" >/dev/null
 grep -F 'brew "fzf"' "$RUN_DIR/Brewfile" >/dev/null
 grep -F 'brew "starship"' "$RUN_DIR/Brewfile" >/dev/null
 grep -F 'brew "tmux"' "$RUN_DIR/Brewfile" >/dev/null
+grep -F 'brew "mas"' "$RUN_DIR/Brewfile" >/dev/null
 grep -F 'cask "ghostty"' "$RUN_DIR/Brewfile" >/dev/null
 grep -F 'cask "font-fira-code"' "$RUN_DIR/Brewfile" >/dev/null
+grep -F 'cask "raycast"' "$RUN_DIR/Brewfile" >/dev/null
+grep -F 'cask "macwhisper"' "$RUN_DIR/Brewfile" >/dev/null
+grep -F 'cask "utm"' "$RUN_DIR/Brewfile" >/dev/null
+grep -F 'mas install "$LANG_SWITCHER_APP_ID"' "$RUN_DIR/install.sh" >/dev/null
 
 second_output="$(cd "$RUN_DIR" && printf 'y\n' | ./install.sh)"
 grep -F 'Oh My Zsh already installed' <<< "$second_output" >/dev/null
 grep -F 'TPM already installed' <<< "$second_output" >/dev/null
+grep -F 'Lang Switcher already installed' <<< "$second_output" >/dev/null
 marker_count="$(grep -F -c "# >>> dotfiles zsh" "$FAKE_HOME/.zshrc")"
 test "$marker_count" -eq 1
 

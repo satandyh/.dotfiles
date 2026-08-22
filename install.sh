@@ -7,6 +7,7 @@ CANDIDATE_DIR="$STATE_DIR/candidates"
 RUN_ID="$(date +%Y%m%d-%H%M%S)"
 REPORT_FILE="$STATE_DIR/report-$RUN_ID.md"
 MANUAL_FILE="$STATE_DIR/manual-steps-$RUN_ID.txt"
+LANG_SWITCHER_APP_ID="1597566195"
 
 DONE_COUNT=0
 SKIP_COUNT=0
@@ -80,7 +81,8 @@ preflight() {
 print_plan() {
   log "Plan:"
   log "- Ensure Homebrew is installed."
-  log "- Install or update packages from Brewfile."
+  log "- Install missing packages from Brewfile without upgrading existing ones."
+  log "- Install Lang Switcher from the Mac App Store when signed in."
   log "- Install Oh My Zsh, Zsh plugins, TPM, and tmux plugins."
   log "- Add managed zsh source block to ~/.zshrc."
   log "- Install Ghostty, Starship, and Git config files safely."
@@ -121,6 +123,24 @@ ensure_homebrew() {
 install_brew_bundle() {
   brew bundle install --file "$REPO_ROOT/Brewfile" --no-upgrade
   done_item "Brewfile applied"
+}
+
+install_app_store_apps() {
+  if ! command -v mas >/dev/null 2>&1; then
+    manual_item "Install Lang Switcher from the Mac App Store; the mas command is unavailable."
+    return
+  fi
+
+  if mas list 2>/dev/null | grep -q "^$LANG_SWITCHER_APP_ID "; then
+    skip_item "Lang Switcher already installed"
+    return
+  fi
+
+  if mas install "$LANG_SWITCHER_APP_ID"; then
+    done_item "Lang Switcher installed from the Mac App Store"
+  else
+    manual_item "Sign in to the Mac App Store, then install Lang Switcher (app ID $LANG_SWITCHER_APP_ID)."
+  fi
 }
 
 clone_repo_safely() {
@@ -278,6 +298,7 @@ main() {
   init_state
   ensure_homebrew
   install_brew_bundle
+  install_app_store_apps
   install_terminal_dependencies
   configure_files
   install_tmux_plugins

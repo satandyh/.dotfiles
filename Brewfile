@@ -2,6 +2,7 @@
 brew "curl"
 brew "git"
 brew "htop"
+brew "mas"
 brew "tmux"
 
 # Shell experience
@@ -18,6 +19,9 @@ cask "google-chrome"
 cask "google-drive"
 cask "yandex-disk"
 cask "keepassxc"
+cask "macwhisper"
+cask "raycast"
 cask "claude"
 cask "codex"
 cask "flameshot"
+cask "utm"
