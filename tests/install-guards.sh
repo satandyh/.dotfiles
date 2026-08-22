@@ -56,6 +56,9 @@ case "${1:-}" in
     printf '%s\n' "$FAKE_BREW_PREFIX"
     ;;
   bundle)
+    if [ "${FAKE_BUNDLE_FAIL:-0}" = "1" ]; then
+      exit 1
+    fi
     printf '%s\n' "$*" > "$HOME/.brew-bundle-args"
     : > "$HOME/.brew-bundle-ran"
     exit 0
@@ -94,6 +97,9 @@ done
 
 mkdir -p "$destination/.git"
 case "$destination" in
+  */.oh-my-zsh)
+    : > "$destination/oh-my-zsh.sh"
+    ;;
   */tpm)
     mkdir -p "$destination/bin"
     cat > "$destination/bin/install_plugins" <<'SCRIPT'
@@ -139,6 +145,7 @@ EOF
 
   export HOME="$FAKE_HOME"
   export FAKE_BREW_PREFIX="$CASE_DIR/homebrew"
+  export FAKE_BUNDLE_FAIL=0
   export FAKE_FLAMESHOT_FAIL=0
   export APPLICATIONS_DIR="$CASE_DIR/Applications"
   export USER_APPLICATIONS_DIR="$FAKE_HOME/Applications"
@@ -204,12 +211,29 @@ test -f "$RUN_DIR/state/candidates/HOME_.tmux.conf" || fail "conflicting tmux co
 cmp -s "$RUN_DIR/config/tmux/tmux.conf" "$RUN_DIR/state/candidates/HOME_.tmux.conf" || fail "tmux candidate should match repository config"
 test "$(cat "$FAKE_HOME/.oh-my-zsh/custom/plugins/zsh-autosuggestions/local-setting")" = "local plugin setting" || fail "existing plugin directory should be left untouched"
 test ! -f "$FAKE_HOME/.tmux/plugins/.install-plugins-ran" || fail "tmux plugins should not be installed for a conflicting tmux config"
-grep -F "# >>> dotfiles zsh" "$FAKE_HOME/.zshrc" >/dev/null || fail "managed zsh block should be added"
+assert_contains "$output" "zsh config was not installed because Oh My Zsh is incomplete"
+if grep -F "# >>> dotfiles zsh" "$FAKE_HOME/.zshrc" >/dev/null; then
+  fail "managed zsh block should not be added when Oh My Zsh is incomplete"
+fi
 
 output="$(cd "$RUN_DIR" && printf 'y\n' | ./install.sh)"
-assert_contains "$output" "~/.zshrc already has managed block"
-marker_count="$(grep -F -c "# >>> dotfiles zsh" "$FAKE_HOME/.zshrc")"
-test "$marker_count" -eq 1 || fail "managed zsh block should not be duplicated"
+assert_contains "$output" "zsh config was not installed because Oh My Zsh is incomplete"
+if grep -F "# >>> dotfiles zsh" "$FAKE_HOME/.zshrc" >/dev/null; then
+  fail "repeated runs should not add a managed block when Oh My Zsh is incomplete"
+fi
+
+prepare_case "bundle-failure" "Darwin" "arm64"
+export FAKE_BUNDLE_FAIL=1
+set +e
+output="$(cd "$RUN_DIR" && printf 'y\n' | ./install.sh 2>&1)"
+status="$?"
+set -e
+test "$status" -ne 0 || fail "Brew bundle failure should fail the installer"
+assert_contains "$output" "- Status: Failed"
+assert_contains "$output" "Setup stopped at line"
+report="$(find "$RUN_DIR/state" -name 'report-*.md' -type f | head -n 1)"
+test -n "$report" || fail "failure should write a report"
+grep -F -- '- Status: Failed' "$report" >/dev/null || fail "failure report should record failed status"
 
 prepare_case "optional-cask-failure" "Darwin" "arm64"
 export FAKE_FLAMESHOT_FAIL=1

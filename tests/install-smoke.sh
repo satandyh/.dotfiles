@@ -36,6 +36,9 @@ case "${1:-}" in
     printf '%s\n' "$FAKE_BREW_PREFIX"
     ;;
   bundle)
+    if [ "${FAKE_BUNDLE_FAIL:-0}" = "1" ]; then
+      exit 1
+    fi
     printf '%s\n' "$*" > "$HOME/.brew-bundle-args"
     : > "$HOME/.brew-bundle-ran"
     exit 0
@@ -71,6 +74,9 @@ done
 
 mkdir -p "$destination/.git"
 case "$destination" in
+  */.oh-my-zsh)
+    : > "$destination/oh-my-zsh.sh"
+    ;;
   */tpm)
     mkdir -p "$destination/bin"
     cat > "$destination/bin/install_plugins" <<'SCRIPT'
@@ -116,6 +122,7 @@ chmod +x "$FAKE_BIN/uname" "$FAKE_BIN/brew" "$FAKE_BIN/git" "$FAKE_BIN/mas" "$FA
 
 export HOME="$FAKE_HOME"
 export FAKE_BREW_PREFIX="$WORK_DIR/homebrew"
+export FAKE_BUNDLE_FAIL=0
 export APPLICATIONS_DIR="$WORK_DIR/Applications"
 export USER_APPLICATIONS_DIR="$FAKE_HOME/Applications"
 export PATH="$FAKE_BIN:/usr/bin:/bin:/usr/sbin:/sbin"
@@ -134,6 +141,7 @@ test -n "$manual_steps"
 grep -F -- '- Done:' "$report" >/dev/null
 grep -F -- '- Skipped:' "$report" >/dev/null
 grep -F -- '- Manual steps:' "$report" >/dev/null
+grep -F -- '- Status: Completed' "$report" >/dev/null
 grep -F '## Manual Steps' "$report" >/dev/null
 grep -F 'Report written to' <<< "$output" >/dev/null
 grep -F '# macOS Setup Report' <<< "$output" >/dev/null
@@ -146,6 +154,11 @@ test -f "$FAKE_HOME/.config/dotfiles/zsh/zshrc"
 test -f "$FAKE_HOME/.gitconfig"
 test -f "$FAKE_HOME/.gitconfig-default"
 test -f "$FAKE_HOME/.gitconfig-github"
+grep -F 'background-opacity = 0.7' "$FAKE_HOME/.config/ghostty/config" >/dev/null
+grep -F 'background-blur = true' "$FAKE_HOME/.config/ghostty/config" >/dev/null
+grep -F 'window-save-state = always' "$FAKE_HOME/.config/ghostty/config" >/dev/null
+grep -F 'name = John Doe' "$FAKE_HOME/.gitconfig-default" >/dev/null
+grep -F 'email = john.doe@example.com' "$FAKE_HOME/.gitconfig-default" >/dev/null
 test -d "$FAKE_HOME/.oh-my-zsh/.git"
 test -d "$FAKE_HOME/.oh-my-zsh/custom/plugins/zsh-autosuggestions/.git"
 test -d "$FAKE_HOME/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting/.git"

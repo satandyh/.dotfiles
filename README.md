@@ -1,6 +1,6 @@
 # macOS Terminal Setup
 
-This repository installs and configures a reproducible terminal environment for Apple Silicon Macs. After cloning the repository, one installer command sets up the required programs, fonts, plugins, and managed configuration files.
+This repository installs and configures a repeatable terminal environment for Apple Silicon Macs. After cloning the repository, one installer command sets up the required programs, fonts, plugins, and managed configuration files.
 
 ## What It Installs
 
@@ -20,6 +20,8 @@ This repository installs and configures a reproducible terminal environment for 
 - Git global includes for default identity and GitHub-specific identity selected by remote URL.
 - Finder hidden files visibility.
 
+The non-GitHub Git identity intentionally remains the placeholder `John Doe <john.doe@example.com>`. Repositories with GitHub remotes use the separate GitHub identity.
+
 ## Usage
 
 ```sh
@@ -30,6 +32,8 @@ cd ~/git/.dotfiles && ./install.sh
 After the repository is downloaded, `./install.sh` is the single command that deploys the terminal. It prints a plan, asks for confirmation, installs dependencies in order, and writes a report under `state/`.
 
 Homebrew installs only missing Brewfile dependencies. Programs that are already present are kept as installed and are not upgraded automatically. Apps already found in `/Applications` or `~/Applications` are not adopted or reinstalled.
+
+Dependency versions are intentionally not pinned. A first-time installation uses the versions currently available from Homebrew and the latest default branches of the referenced Git repositories. Existing installations are reused; update them separately when desired.
 
 ## Installation Channels
 

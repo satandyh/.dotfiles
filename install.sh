@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -euo pipefail
+set -eEuo pipefail
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 STATE_DIR="$REPO_ROOT/state"
@@ -14,6 +14,7 @@ USER_APPLICATIONS_DIR="${USER_APPLICATIONS_DIR:-$HOME/Applications}"
 DONE_COUNT=0
 SKIP_COUNT=0
 MANUAL_COUNT=0
+RUN_STATUS="Completed"
 
 log() {
   printf '%s\n' "$*"
@@ -256,6 +257,11 @@ ensure_managed_block() {
 }
 
 configure_zsh() {
+  if [ ! -r "$HOME/.oh-my-zsh/oh-my-zsh.sh" ]; then
+    manual_item "zsh config was not installed because Oh My Zsh is incomplete at $HOME/.oh-my-zsh"
+    return
+  fi
+
   install_file_safely "$REPO_ROOT/config/zsh/zshrc" "$HOME/.config/dotfiles/zsh/zshrc" "zsh config"
 
   block='# >>> dotfiles zsh
@@ -304,6 +310,7 @@ write_manual_steps() {
 write_report() {
   {
     printf '# macOS Setup Report\n\n'
+    printf -- '- Status: %s\n' "$RUN_STATUS"
     printf -- '- Done: %s\n' "$DONE_COUNT"
     printf -- '- Skipped: %s\n' "$SKIP_COUNT"
     printf -- '- Manual steps: %s\n\n' "$MANUAL_COUNT"
@@ -320,12 +327,25 @@ write_report() {
   cat "$REPORT_FILE"
 }
 
+handle_error() {
+  status="$1"
+  line="$2"
+  command="$3"
+
+  trap - ERR
+  RUN_STATUS="Failed"
+  manual_item "Setup stopped at line $line while running: $command"
+  write_report
+  exit "$status"
+}
+
 main() {
   require_macos
   preflight
   print_plan
   confirm
   init_state
+  trap 'handle_error "$?" "$LINENO" "$BASH_COMMAND"' ERR
   ensure_homebrew
   install_brew_bundle
   install_app_store_apps
@@ -336,6 +356,7 @@ main() {
   configure_finder
   write_manual_steps
   write_report
+  trap - ERR
 }
 
 main "$@"
