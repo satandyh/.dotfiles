@@ -296,7 +296,7 @@ write_manual_steps() {
   manual_item "Sign in to Yandex Disk and confirm sync folders."
   manual_item "Open KeePassXC and connect your database/browser integration."
   manual_item "Open Claude and sign in."
-  manual_item "Run Codex login/setup if required by the installed Codex app or CLI."
+  manual_item "Open ChatGPT and sign in."
   manual_item "Install VS Code extensions manually if needed: Codex, Anthropic/Claude, Google Cloud Code, Project Manager."
   manual_item "Grant Flameshot Screen Recording or Accessibility permission if macOS asks."
 }

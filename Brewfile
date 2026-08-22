@@ -24,7 +24,4 @@ cask "macwhisper" unless File.exist?("/Applications/MacWhisper.app") || File.exi
 cask "raycast" unless File.exist?("/Applications/Raycast.app") || File.exist?(File.expand_path("~/Applications/Raycast.app"))
 cask "claude" unless File.exist?("/Applications/Claude.app") || File.exist?(File.expand_path("~/Applications/Claude.app"))
 cask "chatgpt" unless File.exist?("/Applications/ChatGPT.app") || File.exist?(File.expand_path("~/Applications/ChatGPT.app"))
-
-# Codex CLI is separate from the desktop ChatGPT app that includes Codex.
-cask "codex"
 cask "utm" unless File.exist?("/Applications/UTM.app") || File.exist?(File.expand_path("~/Applications/UTM.app"))

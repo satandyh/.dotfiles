@@ -6,7 +6,7 @@ This repository installs and configures a reproducible terminal environment for 
 
 - Homebrew if missing.
 - CLI tools: `git`, `curl`, `htop`, `mas`, `tmux`, `starship`, and `fzf`.
-- Apps and fonts through Homebrew Cask using official upstream artifacts: Ghostty, VS Code, Chrome, Google Drive, Yandex Disk, KeePassXC, MacWhisper, Raycast, Claude, ChatGPT, the Codex CLI, UTM, Flameshot, and Fira Code.
+- Apps and fonts through Homebrew Cask using official upstream artifacts: Ghostty, VS Code, Chrome, Google Drive, Yandex Disk, KeePassXC, MacWhisper, Raycast, Claude, ChatGPT, UTM, Flameshot, and Fira Code.
 - Lang Switcher through the Mac App Store, using `mas` when the current Apple ID session permits it.
 - Oh My Zsh and the autosuggestions, syntax-highlighting, and completions plugins.
 - TPM and the tmux sensible, resurrect, and yank plugins.
@@ -38,14 +38,14 @@ Each program uses a repeatable form of its preferred macOS distribution channel:
 | Channel | Programs |
 | --- | --- |
 | Homebrew formula | Homebrew, Git, curl, htop, mas, tmux, Starship, fzf |
-| Homebrew Cask fetching the vendor's official artifact | Fira Code, Ghostty, VS Code, Chrome, Google Drive, Yandex Disk, KeePassXC, MacWhisper, Raycast, Claude, ChatGPT, Codex CLI, UTM |
+| Homebrew Cask fetching the vendor's official artifact | Fira Code, Ghostty, VS Code, Chrome, Google Drive, Yandex Disk, KeePassXC, MacWhisper, Raycast, Claude, ChatGPT, UTM |
 | Mac App Store through `mas` | Lang Switcher |
 | Isolated Homebrew Cask attempt with manual fallback | Flameshot |
 | Official Git repository | Oh My Zsh, its Zsh plugins, TPM |
 
 Flameshot is kept outside the main bundle because its Homebrew cask currently has a macOS Gatekeeper compatibility issue. A Flameshot failure is reported as a manual step and does not stop the rest of the setup. The installer never disables Gatekeeper or removes quarantine attributes.
 
-ChatGPT is the desktop application that includes Codex; the `codex` cask installs the separate command-line tool.
+ChatGPT and Claude are installed only as desktop applications. Their command-line tools are not part of this setup.
 
 Raycast, Lang Switcher, MacWhisper, UTM, and the other non-terminal apps are install-only in this iteration. Raycast settings and data export will be handled separately using Raycast's encrypted `.rayconfig` format.
 
@@ -59,6 +59,6 @@ Cleanup is never automatic. If cleanup candidates appear, review the generated r
 
 ## Manual Follow-up
 
-After installation, sign in to Chrome, Google Drive, Yandex Disk, Claude, Codex, and KeePassXC as needed. VS Code extensions are not installed automatically; recommended manual installs are Codex, Anthropic/Claude, Google Cloud Code, and Project Manager.
+After installation, sign in to Chrome, Google Drive, Yandex Disk, Claude, ChatGPT, and KeePassXC as needed. VS Code extensions are not installed automatically; recommended manual installs are Codex, Anthropic/Claude, Google Cloud Code, and Project Manager.
 
 Flameshot may require macOS Screen Recording or Accessibility permissions before it can capture the screen.

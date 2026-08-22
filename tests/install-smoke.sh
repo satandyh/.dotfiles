@@ -165,7 +165,10 @@ grep -F 'cask "raycast"' "$RUN_DIR/Brewfile" >/dev/null
 grep -F 'cask "macwhisper"' "$RUN_DIR/Brewfile" >/dev/null
 grep -F 'cask "utm"' "$RUN_DIR/Brewfile" >/dev/null
 grep -F 'cask "chatgpt"' "$RUN_DIR/Brewfile" >/dev/null
-grep -F 'cask "codex"' "$RUN_DIR/Brewfile" >/dev/null
+if grep -F 'cask "codex"' "$RUN_DIR/Brewfile" >/dev/null; then
+  printf 'The Codex CLI must not be installed\n' >&2
+  exit 1
+fi
 if grep -F 'cask "flameshot"' "$RUN_DIR/Brewfile" >/dev/null; then
   printf 'Flameshot must not be able to fail the main Brew bundle\n' >&2
   exit 1

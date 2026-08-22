@@ -20,6 +20,6 @@ Install every program in the repository through an appropriate, repeatable macOS
 
 - Every catalog entry has a documented installation channel.
 - Lang Switcher uses the Mac App Store and the remaining casks use official upstream artifacts.
-- Desktop Codex and the Codex CLI are represented accurately.
+- ChatGPT and Claude are installed as desktop applications without their command-line tools.
 - Flameshot failure is isolated and reported for manual follow-up.
 - Isolated smoke and guard tests pass.
