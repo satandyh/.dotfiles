@@ -36,10 +36,39 @@ case "${1:-}" in
     printf '%s\n' "$FAKE_BREW_PREFIX"
     ;;
   bundle)
+    printf '%s\n' "$*" > "$HOME/.brew-bundle-args"
+    : > "$HOME/.brew-bundle-ran"
     exit 0
     ;;
   *)
     exit 0
+    ;;
+esac
+EOF
+
+cat > "$FAKE_BIN/git" <<'EOF'
+#!/usr/bin/env bash
+if [ "${1:-}" != "clone" ]; then
+  exit 0
+fi
+
+test -f "$HOME/.brew-bundle-ran"
+
+for arg in "$@"; do
+  destination="$arg"
+done
+
+mkdir -p "$destination/.git"
+case "$destination" in
+  */tpm)
+    mkdir -p "$destination/bin"
+    cat > "$destination/bin/install_plugins" <<'SCRIPT'
+#!/usr/bin/env bash
+test -f "$HOME/.tmux.conf"
+mkdir -p "$HOME/.tmux/plugins"
+: > "$HOME/.tmux/plugins/.install-plugins-ran"
+SCRIPT
+    chmod +x "$destination/bin/install_plugins"
     ;;
 esac
 EOF
@@ -57,7 +86,7 @@ cat > "$FAKE_BIN/killall" <<'EOF'
 exit 0
 EOF
 
-chmod +x "$FAKE_BIN/uname" "$FAKE_BIN/brew" "$FAKE_BIN/defaults" "$FAKE_BIN/killall"
+chmod +x "$FAKE_BIN/uname" "$FAKE_BIN/brew" "$FAKE_BIN/git" "$FAKE_BIN/defaults" "$FAKE_BIN/killall"
 
 export HOME="$FAKE_HOME"
 export FAKE_BREW_PREFIX="$WORK_DIR/homebrew"
@@ -83,10 +112,29 @@ grep -F '# macOS Setup Report' <<< "$output" >/dev/null
 grep -F -- '- Done:' <<< "$output" >/dev/null
 grep -F '## Manual Steps' <<< "$output" >/dev/null
 test -f "$FAKE_HOME/.config/ghostty/config"
+test -f "$FAKE_HOME/.tmux.conf"
 test -f "$FAKE_HOME/.config/starship.toml"
 test -f "$FAKE_HOME/.config/dotfiles/zsh/zshrc"
 test -f "$FAKE_HOME/.gitconfig"
 test -f "$FAKE_HOME/.gitconfig-default"
 test -f "$FAKE_HOME/.gitconfig-github"
+test -d "$FAKE_HOME/.oh-my-zsh/.git"
+test -d "$FAKE_HOME/.oh-my-zsh/custom/plugins/zsh-autosuggestions/.git"
+test -d "$FAKE_HOME/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting/.git"
+test -d "$FAKE_HOME/.oh-my-zsh/custom/plugins/zsh-completions/.git"
+test -d "$FAKE_HOME/.tmux/plugins/tpm/.git"
+test -f "$FAKE_HOME/.tmux/plugins/.install-plugins-ran"
+grep -F -- '--no-upgrade' "$FAKE_HOME/.brew-bundle-args" >/dev/null
+grep -F 'brew "fzf"' "$RUN_DIR/Brewfile" >/dev/null
+grep -F 'brew "starship"' "$RUN_DIR/Brewfile" >/dev/null
+grep -F 'brew "tmux"' "$RUN_DIR/Brewfile" >/dev/null
+grep -F 'cask "ghostty"' "$RUN_DIR/Brewfile" >/dev/null
+grep -F 'cask "font-fira-code"' "$RUN_DIR/Brewfile" >/dev/null
+
+second_output="$(cd "$RUN_DIR" && printf 'y\n' | ./install.sh)"
+grep -F 'Oh My Zsh already installed' <<< "$second_output" >/dev/null
+grep -F 'TPM already installed' <<< "$second_output" >/dev/null
+marker_count="$(grep -F -c "# >>> dotfiles zsh" "$FAKE_HOME/.zshrc")"
+test "$marker_count" -eq 1
 
 printf 'install smoke test passed\n'

@@ -59,6 +59,7 @@ preflight() {
     "$REPO_ROOT/Brewfile" \
     "$REPO_ROOT/config/ghostty/config" \
     "$REPO_ROOT/config/starship/starship.toml" \
+    "$REPO_ROOT/config/tmux/tmux.conf" \
     "$REPO_ROOT/config/zsh/zshrc" \
     "$REPO_ROOT/config/git/.gitconfig" \
     "$REPO_ROOT/config/git/.gitconfig-default" \
@@ -80,6 +81,7 @@ print_plan() {
   log "Plan:"
   log "- Ensure Homebrew is installed."
   log "- Install or update packages from Brewfile."
+  log "- Install Oh My Zsh, Zsh plugins, TPM, and tmux plugins."
   log "- Add managed zsh source block to ~/.zshrc."
   log "- Install Ghostty, Starship, and Git config files safely."
   log "- Enable hidden files in Finder."
@@ -117,8 +119,48 @@ ensure_homebrew() {
 }
 
 install_brew_bundle() {
-  brew bundle --file "$REPO_ROOT/Brewfile"
+  brew bundle install --file "$REPO_ROOT/Brewfile" --no-upgrade
   done_item "Brewfile applied"
+}
+
+clone_repo_safely() {
+  repo="$1"
+  dest="$2"
+  label="$3"
+
+  if [ -d "$dest/.git" ]; then
+    skip_item "$label already installed"
+  elif [ -e "$dest" ] || [ -L "$dest" ]; then
+    manual_item "$label was not installed because $dest already exists and is not a Git checkout"
+  else
+    mkdir -p "$(dirname "$dest")"
+    git clone --depth=1 "$repo" "$dest"
+    done_item "$label installed at $dest"
+  fi
+}
+
+install_terminal_dependencies() {
+  clone_repo_safely "https://github.com/ohmyzsh/ohmyzsh.git" "$HOME/.oh-my-zsh" "Oh My Zsh"
+  clone_repo_safely "https://github.com/zsh-users/zsh-autosuggestions.git" "$HOME/.oh-my-zsh/custom/plugins/zsh-autosuggestions" "zsh-autosuggestions"
+  clone_repo_safely "https://github.com/zsh-users/zsh-syntax-highlighting.git" "$HOME/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting" "zsh-syntax-highlighting"
+  clone_repo_safely "https://github.com/zsh-users/zsh-completions.git" "$HOME/.oh-my-zsh/custom/plugins/zsh-completions" "zsh-completions"
+  clone_repo_safely "https://github.com/tmux-plugins/tpm.git" "$HOME/.tmux/plugins/tpm" "TPM"
+}
+
+install_tmux_plugins() {
+  if ! cmp -s "$REPO_ROOT/config/tmux/tmux.conf" "$HOME/.tmux.conf"; then
+    manual_item "tmux plugins were not installed because ~/.tmux.conf does not match the managed config"
+    return
+  fi
+
+  plugin_installer="$HOME/.tmux/plugins/tpm/bin/install_plugins"
+  if [ ! -x "$plugin_installer" ]; then
+    manual_item "tmux plugins were not installed because TPM is unavailable at $plugin_installer"
+    return
+  fi
+
+  "$plugin_installer"
+  done_item "tmux plugins installed"
 }
 
 safe_name_for_path() {
@@ -181,6 +223,7 @@ configure_git() {
 configure_files() {
   install_file_safely "$REPO_ROOT/config/ghostty/config" "$HOME/.config/ghostty/config" "Ghostty config"
   install_file_safely "$REPO_ROOT/config/starship/starship.toml" "$HOME/.config/starship.toml" "Starship config"
+  install_file_safely "$REPO_ROOT/config/tmux/tmux.conf" "$HOME/.tmux.conf" "tmux config"
   configure_zsh
   configure_git
 }
@@ -235,7 +278,9 @@ main() {
   init_state
   ensure_homebrew
   install_brew_bundle
+  install_terminal_dependencies
   configure_files
+  install_tmux_plugins
   configure_finder
   write_manual_steps
   write_report

@@ -1,17 +1,20 @@
-# macOS Environment Setup
+# macOS Terminal Setup
 
-This repository prepares a lightweight macOS development and management environment for Apple Silicon machines. It replaces the old Ansible/Linux setup with a simple installer, a `Brewfile`, and a few managed config files.
+This repository installs and configures a reproducible terminal environment for Apple Silicon Macs. After cloning the repository, one installer command sets up the required programs, fonts, plugins, and managed configuration files.
 
 ## What It Installs
 
 - Homebrew if missing.
-- CLI tools: `git`, `curl`, `htop`, `tmux`, `starship`, `fzf`, and zsh helper plugins.
+- CLI tools: `git`, `curl`, `htop`, `tmux`, `starship`, and `fzf`.
 - Apps and fonts through Homebrew Cask: Ghostty, VS Code, Chrome, Google Drive, Yandex Disk, KeePassXC, Claude, Codex, Flameshot, and Fira Code.
+- Oh My Zsh and the autosuggestions, syntax-highlighting, and completions plugins.
+- TPM and the tmux sensible, resurrect, and yank plugins.
 
 ## What It Configures
 
-- zsh history, completions, autosuggestions, syntax highlighting, fzf integration, and Starship prompt.
-- Ghostty with Fira Code, light transparency, blur, and window state persistence.
+- Zsh with Oh My Zsh, completions, autosuggestions, syntax highlighting, fzf integration, and Starship prompt.
+- Ghostty with Fira Code, Apple System Colors, and light transparency.
+- tmux mouse and copy-mode behavior plus TPM-managed sensible, resurrect, and yank plugins.
 - Starship prompt using the existing repository style as a starting point.
 - Git global includes for default identity and GitHub-specific identity selected by remote URL.
 - Finder hidden files visibility.
@@ -20,15 +23,18 @@ This repository prepares a lightweight macOS development and management environm
 
 ```sh
 git clone git@github.com:satandyh/.dotfiles.git ~/git/.dotfiles
-cd ~/git/.dotfiles
-./install.sh
+cd ~/git/.dotfiles && ./install.sh
 ```
 
-The installer prints a plan first, asks for confirmation, applies only additive changes, and writes a report under `state/`.
+After the repository is downloaded, `./install.sh` is the single command that deploys the terminal. It prints a plan, asks for confirmation, installs dependencies in order, and writes a report under `state/`.
+
+Homebrew installs only missing Brewfile dependencies. Programs that are already present are kept as installed and are not upgraded automatically.
 
 ## Safety
 
 The installer does not delete existing app settings or old config files. If a target config already exists and differs, it writes a candidate file under `state/candidates/` and reports a manual merge step.
+
+Existing Oh My Zsh, Zsh plugin, TPM, and tmux plugin directories are reused and never replaced by the installer.
 
 Cleanup is never automatic. If cleanup candidates appear, review the generated report and remove files yourself later.
 

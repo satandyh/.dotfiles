@@ -7,9 +7,6 @@ brew "tmux"
 # Shell experience
 brew "starship"
 brew "fzf"
-brew "zsh-autosuggestions"
-brew "zsh-completions"
-brew "zsh-syntax-highlighting"
 
 # Fonts
 cask "font-fira-code"

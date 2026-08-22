@@ -56,10 +56,39 @@ case "${1:-}" in
     printf '%s\n' "$FAKE_BREW_PREFIX"
     ;;
   bundle)
+    printf '%s\n' "$*" > "$HOME/.brew-bundle-args"
+    : > "$HOME/.brew-bundle-ran"
     exit 0
     ;;
   *)
     exit 0
+    ;;
+esac
+EOF
+
+  cat > "$FAKE_BIN/git" <<'EOF'
+#!/usr/bin/env bash
+if [ "${1:-}" != "clone" ]; then
+  exit 0
+fi
+
+test -f "$HOME/.brew-bundle-ran"
+
+for arg in "$@"; do
+  destination="$arg"
+done
+
+mkdir -p "$destination/.git"
+case "$destination" in
+  */tpm)
+    mkdir -p "$destination/bin"
+    cat > "$destination/bin/install_plugins" <<'SCRIPT'
+#!/usr/bin/env bash
+test -f "$HOME/.tmux.conf"
+mkdir -p "$HOME/.tmux/plugins"
+: > "$HOME/.tmux/plugins/.install-plugins-ran"
+SCRIPT
+    chmod +x "$destination/bin/install_plugins"
     ;;
 esac
 EOF
@@ -77,7 +106,7 @@ EOF
 exit 0
 EOF
 
-  chmod +x "$FAKE_BIN/uname" "$FAKE_BIN/brew" "$FAKE_BIN/defaults" "$FAKE_BIN/killall"
+  chmod +x "$FAKE_BIN/uname" "$FAKE_BIN/brew" "$FAKE_BIN/git" "$FAKE_BIN/defaults" "$FAKE_BIN/killall"
 
   export HOME="$FAKE_HOME"
   export FAKE_BREW_PREFIX="$CASE_DIR/homebrew"
@@ -126,7 +155,10 @@ test ! -d "$RUN_DIR/state" || fail "preflight should stop before state files are
 
 prepare_case "conflict" "Darwin" "arm64"
 mkdir -p "$FAKE_HOME/.config/ghostty"
+mkdir -p "$FAKE_HOME/.oh-my-zsh/custom/plugins/zsh-autosuggestions"
 printf 'local ghostty setting\n' > "$FAKE_HOME/.config/ghostty/config"
+printf 'local tmux setting\n' > "$FAKE_HOME/.tmux.conf"
+printf 'local plugin setting\n' > "$FAKE_HOME/.oh-my-zsh/custom/plugins/zsh-autosuggestions/local-setting"
 printf '# local zshrc\n' > "$FAKE_HOME/.zshrc"
 
 output="$(cd "$RUN_DIR" && printf 'y\n' | ./install.sh)"
@@ -134,6 +166,12 @@ assert_contains "$output" "Ghostty config differs from existing"
 test "$(cat "$FAKE_HOME/.config/ghostty/config")" = "local ghostty setting" || fail "existing config should be left untouched"
 test -f "$RUN_DIR/state/candidates/HOME_.config_ghostty_config" || fail "conflicting config should write a candidate"
 cmp -s "$RUN_DIR/config/ghostty/config" "$RUN_DIR/state/candidates/HOME_.config_ghostty_config" || fail "candidate should match repository config"
+assert_contains "$output" "tmux config differs from existing"
+test "$(cat "$FAKE_HOME/.tmux.conf")" = "local tmux setting" || fail "existing tmux config should be left untouched"
+test -f "$RUN_DIR/state/candidates/HOME_.tmux.conf" || fail "conflicting tmux config should write a candidate"
+cmp -s "$RUN_DIR/config/tmux/tmux.conf" "$RUN_DIR/state/candidates/HOME_.tmux.conf" || fail "tmux candidate should match repository config"
+test "$(cat "$FAKE_HOME/.oh-my-zsh/custom/plugins/zsh-autosuggestions/local-setting")" = "local plugin setting" || fail "existing plugin directory should be left untouched"
+test ! -f "$FAKE_HOME/.tmux/plugins/.install-plugins-ran" || fail "tmux plugins should not be installed for a conflicting tmux config"
 grep -F "# >>> dotfiles zsh" "$FAKE_HOME/.zshrc" >/dev/null || fail "managed zsh block should be added"
 
 output="$(cd "$RUN_DIR" && printf 'y\n' | ./install.sh)"
