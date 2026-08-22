@@ -2,4 +2,4 @@ font-family = "Fira Code Regular"
 background-opacity = 0.7
 background-blur = true
 window-save-state = always
-#theme = "Apple System Colors"
+theme = "Apple System Colors"

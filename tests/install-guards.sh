@@ -222,6 +222,16 @@ if grep -F "# >>> dotfiles zsh" "$FAKE_HOME/.zshrc" >/dev/null; then
   fail "repeated runs should not add a managed block when Oh My Zsh is incomplete"
 fi
 
+prepare_case "zsh-loader-conflict" "Darwin" "arm64"
+printf '# keep my local zsh setup\n' > "$FAKE_HOME/.zshrc"
+
+output="$(cd "$RUN_DIR" && printf 'y\n' | ./install.sh)"
+assert_contains "$output" "zsh loader differs from existing"
+test "$(cat "$FAKE_HOME/.zshrc")" = "# keep my local zsh setup" || fail "existing zshrc should be left untouched"
+test -f "$RUN_DIR/state/candidates/HOME_.zshrc" || fail "conflicting zshrc should write a loader candidate"
+cmp -s "$RUN_DIR/config/zsh/zshrc-loader" "$RUN_DIR/state/candidates/HOME_.zshrc" || fail "zsh loader candidate should match repository config"
+test -f "$FAKE_HOME/.config/dotfiles/zsh/zshrc" || fail "standalone zsh config should still be installed"
+
 prepare_case "bundle-failure" "Darwin" "arm64"
 export FAKE_BUNDLE_FAIL=1
 set +e

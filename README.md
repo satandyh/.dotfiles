@@ -13,10 +13,10 @@ This repository installs and configures a repeatable terminal environment for Ap
 
 ## What It Configures
 
-- Zsh with Oh My Zsh, completions, autosuggestions, syntax highlighting, fzf integration, and Starship prompt.
+- Zsh with Oh My Zsh, completions, autosuggestions, syntax highlighting, fzf integration, and the Tokyo Night Starship prompt. Oh My Zsh does not load its own prompt theme.
 - Ghostty with Fira Code, Apple System Colors, and light transparency.
 - tmux mouse and copy-mode behavior plus TPM-managed sensible, resurrect, and yank plugins.
-- Starship prompt using the existing repository style as a starting point.
+- A standalone managed Zsh config loaded by a minimal `~/.zshrc`; Oh My Zsh, fzf, and Starship are each initialized once.
 - Git global includes for default identity and GitHub-specific identity selected by remote URL.
 - Finder hidden files visibility.
 

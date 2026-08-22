@@ -1,12 +1,11 @@
 export ZSH="$HOME/.oh-my-zsh"
 export PATH="/opt/homebrew/bin:/opt/homebrew/sbin:$PATH"
-#plugins=(git docker tmux zsh-autosuggestions zsh-syntax-highlighting zsh-completions fzf fzf-tab helm kubectl aws)
-plugins=(git tmux brew zsh-autosuggestions zsh-syntax-highlighting zsh-completions fzf)
+ZSH_THEME=""
+plugins=(git tmux brew zsh-autosuggestions zsh-completions fzf zsh-syntax-highlighting)
 export FZF_DEFAULT_OPTS='--height 40% --layout=reverse --border'
-source $ZSH/oh-my-zsh.sh
+source "$ZSH/oh-my-zsh.sh"
 export GPG_TTY=$(tty)
 export GNUPGHOME=$HOME/.gnupg
-source <(fzf --zsh)
 eval "$(starship init zsh)"
 alias ll="ls -alh --color=always"
 export PATH="$HOME/.local/bin:$PATH"

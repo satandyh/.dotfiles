@@ -65,6 +65,7 @@ preflight() {
     "$REPO_ROOT/config/starship/starship.toml" \
     "$REPO_ROOT/config/tmux/tmux.conf" \
     "$REPO_ROOT/config/zsh/zshrc" \
+    "$REPO_ROOT/config/zsh/zshrc-loader" \
     "$REPO_ROOT/config/git/.gitconfig" \
     "$REPO_ROOT/config/git/.gitconfig-default" \
     "$REPO_ROOT/config/git/.gitconfig-github"
@@ -88,7 +89,7 @@ print_plan() {
   log "- Install Lang Switcher from the Mac App Store when signed in."
   log "- Attempt Flameshot separately so a macOS compatibility failure does not stop setup."
   log "- Install Oh My Zsh, Zsh plugins, TPM, and tmux plugins."
-  log "- Add managed zsh source block to ~/.zshrc."
+  log "- Install a minimal ~/.zshrc that loads the standalone managed zsh config."
   log "- Install Ghostty, Starship, and Git config files safely."
   log "- Enable hidden files in Finder."
   log "- Write a report under state/."
@@ -236,26 +237,6 @@ install_file_safely() {
   fi
 }
 
-ensure_managed_block() {
-  dest="$1"
-  label="$2"
-  block="$3"
-  marker="$4"
-
-  mkdir -p "$(dirname "$dest")"
-  touch "$dest"
-
-  if grep -F "$marker" "$dest" >/dev/null 2>&1; then
-    skip_item "$label already has managed block"
-  else
-    {
-      printf '\n'
-      printf '%s\n' "$block"
-    } >> "$dest"
-    done_item "$label managed block added"
-  fi
-}
-
 configure_zsh() {
   if [ ! -r "$HOME/.oh-my-zsh/oh-my-zsh.sh" ]; then
     manual_item "zsh config was not installed because Oh My Zsh is incomplete at $HOME/.oh-my-zsh"
@@ -263,11 +244,7 @@ configure_zsh() {
   fi
 
   install_file_safely "$REPO_ROOT/config/zsh/zshrc" "$HOME/.config/dotfiles/zsh/zshrc" "zsh config"
-
-  block='# >>> dotfiles zsh
-source "$HOME/.config/dotfiles/zsh/zshrc"
-# <<< dotfiles zsh'
-  ensure_managed_block "$HOME/.zshrc" "~/.zshrc" "$block" "# >>> dotfiles zsh"
+  install_file_safely "$REPO_ROOT/config/zsh/zshrc-loader" "$HOME/.zshrc" "zsh loader"
 }
 
 configure_git() {

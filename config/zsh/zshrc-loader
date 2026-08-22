@@ -1,0 +1,3 @@
+# >>> dotfiles zsh
+source "$HOME/.config/dotfiles/zsh/zshrc"
+# <<< dotfiles zsh

@@ -151,6 +151,14 @@ test -f "$FAKE_HOME/.config/ghostty/config"
 test -f "$FAKE_HOME/.tmux.conf"
 test -f "$FAKE_HOME/.config/starship.toml"
 test -f "$FAKE_HOME/.config/dotfiles/zsh/zshrc"
+test -f "$FAKE_HOME/.zshrc"
+cmp -s "$RUN_DIR/config/zsh/zshrc-loader" "$FAKE_HOME/.zshrc"
+grep -F 'ZSH_THEME=""' "$FAKE_HOME/.config/dotfiles/zsh/zshrc" >/dev/null
+test "$(grep -F -c 'source "$ZSH/oh-my-zsh.sh"' "$FAKE_HOME/.config/dotfiles/zsh/zshrc")" -eq 1
+if grep -F 'source <(fzf --zsh)' "$FAKE_HOME/.config/dotfiles/zsh/zshrc" >/dev/null; then
+  printf 'fzf must be initialized only through the Oh My Zsh plugin\n' >&2
+  exit 1
+fi
 test -f "$FAKE_HOME/.gitconfig"
 test -f "$FAKE_HOME/.gitconfig-default"
 test -f "$FAKE_HOME/.gitconfig-github"
