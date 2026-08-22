@@ -40,6 +40,17 @@ case "${1:-}" in
     : > "$HOME/.brew-bundle-ran"
     exit 0
     ;;
+  list)
+    if [ "${2:-}" = "--cask" ] && [ "${3:-}" = "flameshot" ] && [ -f "$HOME/.flameshot-installed" ]; then
+      exit 0
+    fi
+    exit 1
+    ;;
+  install)
+    test "${2:-}" = "--cask"
+    test "${3:-}" = "flameshot"
+    : > "$HOME/.flameshot-installed"
+    ;;
   *)
     exit 0
     ;;
@@ -105,6 +116,8 @@ chmod +x "$FAKE_BIN/uname" "$FAKE_BIN/brew" "$FAKE_BIN/git" "$FAKE_BIN/mas" "$FA
 
 export HOME="$FAKE_HOME"
 export FAKE_BREW_PREFIX="$WORK_DIR/homebrew"
+export APPLICATIONS_DIR="$WORK_DIR/Applications"
+export USER_APPLICATIONS_DIR="$FAKE_HOME/Applications"
 export PATH="$FAKE_BIN:/usr/bin:/bin:/usr/sbin:/sbin"
 
 mkdir -p "$FAKE_BREW_PREFIX/share/zsh-autosuggestions" \
@@ -140,6 +153,7 @@ test -d "$FAKE_HOME/.oh-my-zsh/custom/plugins/zsh-completions/.git"
 test -d "$FAKE_HOME/.tmux/plugins/tpm/.git"
 test -f "$FAKE_HOME/.tmux/plugins/.install-plugins-ran"
 test -f "$FAKE_HOME/.lang-switcher-installed"
+test -f "$FAKE_HOME/.flameshot-installed"
 grep -F -- '--no-upgrade' "$FAKE_HOME/.brew-bundle-args" >/dev/null
 grep -F 'brew "fzf"' "$RUN_DIR/Brewfile" >/dev/null
 grep -F 'brew "starship"' "$RUN_DIR/Brewfile" >/dev/null
@@ -150,12 +164,20 @@ grep -F 'cask "font-fira-code"' "$RUN_DIR/Brewfile" >/dev/null
 grep -F 'cask "raycast"' "$RUN_DIR/Brewfile" >/dev/null
 grep -F 'cask "macwhisper"' "$RUN_DIR/Brewfile" >/dev/null
 grep -F 'cask "utm"' "$RUN_DIR/Brewfile" >/dev/null
+grep -F 'cask "chatgpt"' "$RUN_DIR/Brewfile" >/dev/null
+grep -F 'cask "codex"' "$RUN_DIR/Brewfile" >/dev/null
+if grep -F 'cask "flameshot"' "$RUN_DIR/Brewfile" >/dev/null; then
+  printf 'Flameshot must not be able to fail the main Brew bundle\n' >&2
+  exit 1
+fi
 grep -F 'mas install "$LANG_SWITCHER_APP_ID"' "$RUN_DIR/install.sh" >/dev/null
+grep -F 'install_optional_cask "flameshot"' "$RUN_DIR/install.sh" >/dev/null
 
 second_output="$(cd "$RUN_DIR" && printf 'y\n' | ./install.sh)"
 grep -F 'Oh My Zsh already installed' <<< "$second_output" >/dev/null
 grep -F 'TPM already installed' <<< "$second_output" >/dev/null
 grep -F 'Lang Switcher already installed' <<< "$second_output" >/dev/null
+grep -F 'Flameshot already installed' <<< "$second_output" >/dev/null
 marker_count="$(grep -F -c "# >>> dotfiles zsh" "$FAKE_HOME/.zshrc")"
 test "$marker_count" -eq 1
 

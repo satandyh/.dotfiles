@@ -60,6 +60,20 @@ case "${1:-}" in
     : > "$HOME/.brew-bundle-ran"
     exit 0
     ;;
+  list)
+    if [ "${2:-}" = "--cask" ] && [ "${3:-}" = "flameshot" ] && [ -f "$HOME/.flameshot-installed" ]; then
+      exit 0
+    fi
+    exit 1
+    ;;
+  install)
+    test "${2:-}" = "--cask"
+    test "${3:-}" = "flameshot"
+    if [ "${FAKE_FLAMESHOT_FAIL:-0}" = "1" ]; then
+      exit 1
+    fi
+    : > "$HOME/.flameshot-installed"
+    ;;
   *)
     exit 0
     ;;
@@ -125,6 +139,9 @@ EOF
 
   export HOME="$FAKE_HOME"
   export FAKE_BREW_PREFIX="$CASE_DIR/homebrew"
+  export FAKE_FLAMESHOT_FAIL=0
+  export APPLICATIONS_DIR="$CASE_DIR/Applications"
+  export USER_APPLICATIONS_DIR="$FAKE_HOME/Applications"
   export PATH="$FAKE_BIN:/usr/bin:/bin:/usr/sbin:/sbin"
 
   mkdir -p "$FAKE_BREW_PREFIX/share/zsh-autosuggestions" \
@@ -193,5 +210,12 @@ output="$(cd "$RUN_DIR" && printf 'y\n' | ./install.sh)"
 assert_contains "$output" "~/.zshrc already has managed block"
 marker_count="$(grep -F -c "# >>> dotfiles zsh" "$FAKE_HOME/.zshrc")"
 test "$marker_count" -eq 1 || fail "managed zsh block should not be duplicated"
+
+prepare_case "optional-cask-failure" "Darwin" "arm64"
+export FAKE_FLAMESHOT_FAIL=1
+output="$(cd "$RUN_DIR" && printf 'y\n' | ./install.sh)"
+assert_contains "$output" "Flameshot was not installed automatically"
+assert_contains "$output" "Report written to"
+test -f "$FAKE_HOME/.config/ghostty/config" || fail "optional app failure should not stop configuration"
 
 printf 'install guard tests passed\n'

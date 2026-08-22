@@ -8,6 +8,8 @@ RUN_ID="$(date +%Y%m%d-%H%M%S)"
 REPORT_FILE="$STATE_DIR/report-$RUN_ID.md"
 MANUAL_FILE="$STATE_DIR/manual-steps-$RUN_ID.txt"
 LANG_SWITCHER_APP_ID="1597566195"
+APPLICATIONS_DIR="${APPLICATIONS_DIR:-/Applications}"
+USER_APPLICATIONS_DIR="${USER_APPLICATIONS_DIR:-$HOME/Applications}"
 
 DONE_COUNT=0
 SKIP_COUNT=0
@@ -83,6 +85,7 @@ print_plan() {
   log "- Ensure Homebrew is installed."
   log "- Install missing packages from Brewfile without upgrading existing ones."
   log "- Install Lang Switcher from the Mac App Store when signed in."
+  log "- Attempt Flameshot separately so a macOS compatibility failure does not stop setup."
   log "- Install Oh My Zsh, Zsh plugins, TPM, and tmux plugins."
   log "- Add managed zsh source block to ~/.zshrc."
   log "- Install Ghostty, Starship, and Git config files safely."
@@ -125,7 +128,34 @@ install_brew_bundle() {
   done_item "Brewfile applied"
 }
 
+application_exists() {
+  app_name="$1"
+  [ -d "$APPLICATIONS_DIR/$app_name" ] || [ -d "$USER_APPLICATIONS_DIR/$app_name" ]
+}
+
+install_optional_cask() {
+  token="$1"
+  label="$2"
+  app_name="$3"
+
+  if brew list --cask "$token" >/dev/null 2>&1 || application_exists "$app_name"; then
+    skip_item "$label already installed"
+    return
+  fi
+
+  if brew install --cask "$token"; then
+    done_item "$label installed from its official upstream release through Homebrew"
+  else
+    manual_item "$label was not installed automatically. Download it from the official project site and complete macOS security checks manually."
+  fi
+}
+
 install_app_store_apps() {
+  if application_exists "Lang Switcher.app"; then
+    skip_item "Lang Switcher already installed"
+    return
+  fi
+
   if ! command -v mas >/dev/null 2>&1; then
     manual_item "Install Lang Switcher from the Mac App Store; the mas command is unavailable."
     return
@@ -299,6 +329,7 @@ main() {
   ensure_homebrew
   install_brew_bundle
   install_app_store_apps
+  install_optional_cask "flameshot" "Flameshot" "Flameshot.app"
   install_terminal_dependencies
   configure_files
   install_tmux_plugins

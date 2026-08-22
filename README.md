@@ -6,7 +6,7 @@ This repository installs and configures a reproducible terminal environment for 
 
 - Homebrew if missing.
 - CLI tools: `git`, `curl`, `htop`, `mas`, `tmux`, `starship`, and `fzf`.
-- Apps and fonts through Homebrew Cask: Ghostty, VS Code, Chrome, Google Drive, Yandex Disk, KeePassXC, MacWhisper, Raycast, Claude, Codex, Flameshot, UTM, and Fira Code.
+- Apps and fonts through Homebrew Cask using official upstream artifacts: Ghostty, VS Code, Chrome, Google Drive, Yandex Disk, KeePassXC, MacWhisper, Raycast, Claude, ChatGPT, the Codex CLI, UTM, Flameshot, and Fira Code.
 - Lang Switcher through the Mac App Store, using `mas` when the current Apple ID session permits it.
 - Oh My Zsh and the autosuggestions, syntax-highlighting, and completions plugins.
 - TPM and the tmux sensible, resurrect, and yank plugins.
@@ -29,9 +29,25 @@ cd ~/git/.dotfiles && ./install.sh
 
 After the repository is downloaded, `./install.sh` is the single command that deploys the terminal. It prints a plan, asks for confirmation, installs dependencies in order, and writes a report under `state/`.
 
-Homebrew installs only missing Brewfile dependencies. Programs that are already present are kept as installed and are not upgraded automatically.
+Homebrew installs only missing Brewfile dependencies. Programs that are already present are kept as installed and are not upgraded automatically. Apps already found in `/Applications` or `~/Applications` are not adopted or reinstalled.
 
-Raycast, Lang Switcher, MacWhisper, and UTM are install-only in this iteration. Raycast settings and data export will be handled separately using Raycast's encrypted `.rayconfig` format.
+## Installation Channels
+
+Each program uses a repeatable form of its preferred macOS distribution channel:
+
+| Channel | Programs |
+| --- | --- |
+| Homebrew formula | Homebrew, Git, curl, htop, mas, tmux, Starship, fzf |
+| Homebrew Cask fetching the vendor's official artifact | Fira Code, Ghostty, VS Code, Chrome, Google Drive, Yandex Disk, KeePassXC, MacWhisper, Raycast, Claude, ChatGPT, Codex CLI, UTM |
+| Mac App Store through `mas` | Lang Switcher |
+| Isolated Homebrew Cask attempt with manual fallback | Flameshot |
+| Official Git repository | Oh My Zsh, its Zsh plugins, TPM |
+
+Flameshot is kept outside the main bundle because its Homebrew cask currently has a macOS Gatekeeper compatibility issue. A Flameshot failure is reported as a manual step and does not stop the rest of the setup. The installer never disables Gatekeeper or removes quarantine attributes.
+
+ChatGPT is the desktop application that includes Codex; the `codex` cask installs the separate command-line tool.
+
+Raycast, Lang Switcher, MacWhisper, UTM, and the other non-terminal apps are install-only in this iteration. Raycast settings and data export will be handled separately using Raycast's encrypted `.rayconfig` format.
 
 ## Safety
 
