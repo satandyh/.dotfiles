@@ -39,8 +39,32 @@ case "${1:-}" in
     if [ "${FAKE_BUNDLE_FAIL:-0}" = "1" ]; then
       exit 1
     fi
-    printf '%s\n' "$*" > "$HOME/.brew-bundle-args"
+    printf '%s\n' "$*" >> "$HOME/.brew-bundle-args"
+    printf '%s\n' "$DOTFILES_GROUP" >> "$HOME/.brew-bundle-groups"
     : > "$HOME/.brew-bundle-ran"
+    case "$DOTFILES_GROUP" in
+      terminal)
+        for command_name in tmux starship fzf; do
+          printf '#!/usr/bin/env bash\nexit 0\n' > "$(dirname "$0")/$command_name"
+          chmod +x "$(dirname "$0")/$command_name"
+        done
+        mkdir -p "$APPLICATIONS_DIR/Ghostty.app"
+        mkdir -p "$HOME/Library/Fonts"
+        : > "$HOME/Library/Fonts/FiraCode-Regular.ttf"
+        ;;
+      other)
+        mkdir -p \
+          "$APPLICATIONS_DIR/Visual Studio Code.app" \
+          "$APPLICATIONS_DIR/Google Chrome.app" \
+          "$APPLICATIONS_DIR/Google Drive.app" \
+          "$APPLICATIONS_DIR/Yandex.Disk.app" \
+          "$APPLICATIONS_DIR/KeePassXC.app" \
+          "$APPLICATIONS_DIR/MacWhisper.app" \
+          "$APPLICATIONS_DIR/Claude.app" \
+          "$APPLICATIONS_DIR/ChatGPT.app" \
+          "$APPLICATIONS_DIR/UTM.app"
+        ;;
+    esac
     exit 0
     ;;
   list)
@@ -101,6 +125,7 @@ case "${1:-}" in
   install)
     test "${2:-}" = "1597566195"
     : > "$HOME/.lang-switcher-installed"
+    mkdir -p "$USER_APPLICATIONS_DIR/Lang Switcher.app"
     ;;
 esac
 EOF
@@ -142,6 +167,8 @@ grep -F -- '- Done:' "$report" >/dev/null
 grep -F -- '- Skipped:' "$report" >/dev/null
 grep -F -- '- Manual steps:' "$report" >/dev/null
 grep -F -- '- Status: Completed' "$report" >/dev/null
+grep -F -- '- Groups: core terminal other' "$report" >/dev/null
+grep -F -- '- Actions: install config' "$report" >/dev/null
 grep -F '## Manual Steps' "$report" >/dev/null
 grep -F 'Report written to' <<< "$output" >/dev/null
 grep -F '# macOS Setup Report' <<< "$output" >/dev/null
@@ -172,25 +199,33 @@ test -d "$FAKE_HOME/.oh-my-zsh/custom/plugins/zsh-autosuggestions/.git"
 test -d "$FAKE_HOME/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting/.git"
 test -d "$FAKE_HOME/.oh-my-zsh/custom/plugins/zsh-completions/.git"
 test -d "$FAKE_HOME/.tmux/plugins/tpm/.git"
-test -f "$FAKE_HOME/.tmux/plugins/.install-plugins-ran"
+test -d "$FAKE_HOME/.tmux/plugins/tmux-sensible/.git"
+test -d "$FAKE_HOME/.tmux/plugins/tmux-resurrect/.git"
+test -d "$FAKE_HOME/.tmux/plugins/tmux-yank/.git"
 test -f "$FAKE_HOME/.lang-switcher-installed"
 test -f "$FAKE_HOME/.flameshot-installed"
 grep -F -- '--no-upgrade' "$FAKE_HOME/.brew-bundle-args" >/dev/null
-grep -F 'brew "fzf"' "$RUN_DIR/Brewfile" >/dev/null
-grep -F 'brew "starship"' "$RUN_DIR/Brewfile" >/dev/null
-grep -F 'brew "tmux"' "$RUN_DIR/Brewfile" >/dev/null
-grep -F 'brew "mas"' "$RUN_DIR/Brewfile" >/dev/null
-grep -F 'cask "ghostty"' "$RUN_DIR/Brewfile" >/dev/null
-grep -F 'cask "font-fira-code"' "$RUN_DIR/Brewfile" >/dev/null
-grep -F 'cask "raycast"' "$RUN_DIR/Brewfile" >/dev/null
-grep -F 'cask "macwhisper"' "$RUN_DIR/Brewfile" >/dev/null
-grep -F 'cask "utm"' "$RUN_DIR/Brewfile" >/dev/null
-grep -F 'cask "chatgpt"' "$RUN_DIR/Brewfile" >/dev/null
-if grep -F 'cask "codex"' "$RUN_DIR/Brewfile" >/dev/null; then
+test "$(cat "$FAKE_HOME/.brew-bundle-groups")" = "core
+terminal
+other"
+grep -F 'brew "fzf"' "$RUN_DIR/Brewfile.terminal" >/dev/null
+grep -F 'brew "starship"' "$RUN_DIR/Brewfile.terminal" >/dev/null
+grep -F 'brew "tmux"' "$RUN_DIR/Brewfile.terminal" >/dev/null
+grep -F 'brew "git"' "$RUN_DIR/Brewfile.terminal" >/dev/null
+grep -F 'cask "font-fira-code"' "$RUN_DIR/Brewfile.terminal" >/dev/null
+grep -F 'brew "mas"' "$RUN_DIR/Brewfile.core" >/dev/null
+grep -F 'brew "mas"' "$RUN_DIR/Brewfile.other" >/dev/null
+grep -F 'cask "ghostty"' "$RUN_DIR/Brewfile.terminal" >/dev/null
+grep -F 'cask "font-fira-code"' "$RUN_DIR/Brewfile.core" >/dev/null
+grep -F 'cask "raycast"' "$RUN_DIR/Brewfile.core" >/dev/null
+grep -F 'cask "macwhisper"' "$RUN_DIR/Brewfile.other" >/dev/null
+grep -F 'cask "utm"' "$RUN_DIR/Brewfile.other" >/dev/null
+grep -F 'cask "chatgpt"' "$RUN_DIR/Brewfile.other" >/dev/null
+if grep -F 'cask "codex"' "$RUN_DIR"/Brewfile.* >/dev/null; then
   printf 'The Codex CLI must not be installed\n' >&2
   exit 1
 fi
-if grep -F 'cask "flameshot"' "$RUN_DIR/Brewfile" >/dev/null; then
+if grep -F 'cask "flameshot"' "$RUN_DIR"/Brewfile.* >/dev/null; then
   printf 'Flameshot must not be able to fail the main Brew bundle\n' >&2
   exit 1
 fi
@@ -200,6 +235,9 @@ grep -F 'install_optional_cask "flameshot"' "$RUN_DIR/install.sh" >/dev/null
 second_output="$(cd "$RUN_DIR" && printf 'y\n' | ./install.sh)"
 grep -F 'Oh My Zsh already installed' <<< "$second_output" >/dev/null
 grep -F 'TPM already installed' <<< "$second_output" >/dev/null
+grep -F 'tmux-sensible already installed' <<< "$second_output" >/dev/null
+grep -F 'tmux-resurrect already installed' <<< "$second_output" >/dev/null
+grep -F 'tmux-yank already installed' <<< "$second_output" >/dev/null
 grep -F 'Lang Switcher already installed' <<< "$second_output" >/dev/null
 grep -F 'Flameshot already installed' <<< "$second_output" >/dev/null
 marker_count="$(grep -F -c "# >>> dotfiles zsh" "$FAKE_HOME/.zshrc")"

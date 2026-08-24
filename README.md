@@ -29,7 +29,27 @@ git clone git@github.com:satandyh/.dotfiles.git ~/git/.dotfiles
 cd ~/git/.dotfiles && ./install.sh
 ```
 
-After the repository is downloaded, `./install.sh` is the single command that deploys the terminal. It prints a plan, asks for confirmation, installs dependencies in order, and writes a report under `state/`.
+After the repository is downloaded, `./install.sh` installs and configures all groups. Groups and actions can also be selected explicitly, in any order:
+
+```sh
+./install.sh core install
+./install.sh terminal config
+./install.sh core terminal install config
+```
+
+Available groups are `core`, `terminal`, and `other`. Available actions are `install` and `config`. Multiple groups and actions form a union. Omitting the group selects all groups; omitting the action runs both actions.
+
+The groups contain:
+
+- `core`: Git, curl, htop, Raycast, Fira Code, and mas.
+- `terminal`: tmux, Starship, fzf, Oh My Zsh, its Zsh plugins, TPM and its plugins, and Ghostty.
+- `other`: VS Code, Chrome, Google Drive, Yandex Disk, KeePassXC, MacWhisper, Claude, UTM, ChatGPT, Flameshot, and Lang Switcher.
+
+Dependencies are explicit and package-level: `terminal install` also installs Git and Fira Code, while `other install` also installs mas. These dependencies do not select or install the rest of the `core` group.
+
+The `config` action never installs programs. It validates all prerequisites for each selected group before changing config files. If anything is missing, it stops and prints the exact `GROUP install` command to run. When `install` and `config` are combined, installation runs first, followed by validation and configuration.
+
+The installer prints a plan, asks for confirmation, and writes a report under `state/`.
 
 Homebrew installs only missing Brewfile dependencies. Programs that are already present are kept as installed and are not upgraded automatically. Apps already found in `/Applications` or `~/Applications` are not adopted or reinstalled.
 

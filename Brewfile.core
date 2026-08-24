@@ -1,0 +1,7 @@
+brew "curl"
+brew "git"
+brew "htop"
+brew "mas"
+
+cask "raycast" unless File.exist?("/Applications/Raycast.app") || File.exist?(File.expand_path("~/Applications/Raycast.app"))
+cask "font-fira-code"

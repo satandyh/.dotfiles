@@ -16,6 +16,16 @@ SKIP_COUNT=0
 MANUAL_COUNT=0
 RUN_STATUS="Completed"
 
+SELECT_CORE=0
+SELECT_TERMINAL=0
+SELECT_OTHER=0
+DO_INSTALL=0
+DO_CONFIG=0
+GROUP_ARGUMENT_SEEN=0
+ACTION_ARGUMENT_SEEN=0
+SELECTED_GROUPS=""
+SELECTED_ACTIONS=""
+
 log() {
   printf '%s\n' "$*"
 }
@@ -34,6 +44,59 @@ manual_item() {
   MANUAL_COUNT=$((MANUAL_COUNT + 1))
   log "MANUAL: $*"
   printf '%s\n' "$*" >> "$MANUAL_FILE"
+}
+
+usage() {
+  cat <<'EOF'
+Usage: ./install.sh [core] [terminal] [other] [install] [config]
+
+Groups and actions can be combined in any order:
+  ./install.sh core install
+  ./install.sh terminal config
+  ./install.sh core terminal install config
+
+With no group, all groups are selected. With no action, both install and config run.
+EOF
+}
+
+parse_args() {
+  for arg in "$@"; do
+    case "$arg" in
+      core) SELECT_CORE=1; GROUP_ARGUMENT_SEEN=1 ;;
+      terminal) SELECT_TERMINAL=1; GROUP_ARGUMENT_SEEN=1 ;;
+      other) SELECT_OTHER=1; GROUP_ARGUMENT_SEEN=1 ;;
+      install) DO_INSTALL=1; ACTION_ARGUMENT_SEEN=1 ;;
+      config) DO_CONFIG=1; ACTION_ARGUMENT_SEEN=1 ;;
+      -h|--help) usage; exit 0 ;;
+      *)
+        log "Unknown argument: $arg"
+        usage
+        exit 2
+        ;;
+    esac
+  done
+
+  if [ "$GROUP_ARGUMENT_SEEN" -eq 0 ]; then
+    SELECT_CORE=1
+    SELECT_TERMINAL=1
+    SELECT_OTHER=1
+  fi
+
+  if [ "$ACTION_ARGUMENT_SEEN" -eq 0 ]; then
+    DO_INSTALL=1
+    DO_CONFIG=1
+  fi
+
+  selected=""
+  [ "$SELECT_CORE" -eq 0 ] || selected="$selected core"
+  [ "$SELECT_TERMINAL" -eq 0 ] || selected="$selected terminal"
+  [ "$SELECT_OTHER" -eq 0 ] || selected="$selected other"
+  SELECTED_GROUPS="${selected# }"
+
+  selected=""
+  [ "$DO_INSTALL" -eq 0 ] || selected="$selected install"
+  [ "$DO_CONFIG" -eq 0 ] || selected="$selected config"
+  SELECTED_ACTIONS="${selected# }"
 }
 
 require_macos() {
@@ -59,22 +122,39 @@ brew_shellenv() {
 preflight() {
   missing=0
 
-  for path in \
-    "$REPO_ROOT/Brewfile" \
-    "$REPO_ROOT/config/ghostty/config" \
-    "$REPO_ROOT/config/starship/starship.toml" \
-    "$REPO_ROOT/config/tmux/tmux.conf" \
-    "$REPO_ROOT/config/zsh/zshrc" \
-    "$REPO_ROOT/config/zsh/zshrc-loader" \
-    "$REPO_ROOT/config/git/.gitconfig" \
-    "$REPO_ROOT/config/git/.gitconfig-default" \
-    "$REPO_ROOT/config/git/.gitconfig-github"
-  do
+  required_files=""
+  if [ "$DO_INSTALL" -eq 1 ]; then
+    [ "$SELECT_CORE" -eq 0 ] || required_files="$required_files
+$REPO_ROOT/Brewfile.core"
+    [ "$SELECT_TERMINAL" -eq 0 ] || required_files="$required_files
+$REPO_ROOT/Brewfile.terminal"
+    [ "$SELECT_OTHER" -eq 0 ] || required_files="$required_files
+$REPO_ROOT/Brewfile.other"
+  fi
+  if [ "$DO_CONFIG" -eq 1 ] && [ "$SELECT_TERMINAL" -eq 1 ]; then
+    required_files="$required_files
+$REPO_ROOT/config/ghostty/config
+$REPO_ROOT/config/starship/starship.toml
+$REPO_ROOT/config/tmux/tmux.conf
+$REPO_ROOT/config/zsh/zshrc
+$REPO_ROOT/config/zsh/zshrc-loader"
+  fi
+  if [ "$DO_CONFIG" -eq 1 ] && [ "$SELECT_CORE" -eq 1 ]; then
+    required_files="$required_files
+$REPO_ROOT/config/git/.gitconfig
+$REPO_ROOT/config/git/.gitconfig-default
+$REPO_ROOT/config/git/.gitconfig-github"
+  fi
+
+  while IFS= read -r path; do
+    [ -n "$path" ] || continue
     if [ ! -r "$path" ]; then
       log "Missing required file: $path"
       missing=1
     fi
-  done
+  done <<EOF
+$required_files
+EOF
 
   if [ "$missing" -ne 0 ]; then
     log "Preflight failed. No setup changes were applied."
@@ -83,15 +163,13 @@ preflight() {
 }
 
 print_plan() {
-  log "Plan:"
-  log "- Ensure Homebrew is installed."
-  log "- Install missing packages from Brewfile without upgrading existing ones."
-  log "- Install Lang Switcher from the Mac App Store when signed in."
-  log "- Attempt Flameshot separately so a macOS compatibility failure does not stop setup."
-  log "- Install Oh My Zsh, Zsh plugins, TPM, and tmux plugins."
-  log "- Install a minimal ~/.zshrc that loads the standalone managed zsh config."
-  log "- Install Ghostty, Starship, and Git config files safely."
-  log "- Enable hidden files in Finder."
+  log "Plan for groups: $SELECTED_GROUPS"
+  if [ "$DO_INSTALL" -eq 1 ]; then
+    log "- Install selected programs without upgrading existing ones."
+  fi
+  if [ "$DO_CONFIG" -eq 1 ]; then
+    log "- Configure selected groups without overwriting differing files."
+  fi
   log "- Write a report under state/."
   log ""
   log "No cleanup or deletion will be performed."
@@ -126,8 +204,18 @@ ensure_homebrew() {
 }
 
 install_brew_bundle() {
-  brew bundle install --file "$REPO_ROOT/Brewfile" --no-upgrade
-  done_item "Brewfile applied"
+  if [ "$SELECT_CORE" -eq 1 ]; then
+    DOTFILES_GROUP="core" brew bundle install --file "$REPO_ROOT/Brewfile.core" --no-upgrade
+    done_item "core packages installed"
+  fi
+  if [ "$SELECT_TERMINAL" -eq 1 ]; then
+    DOTFILES_GROUP="terminal" brew bundle install --file "$REPO_ROOT/Brewfile.terminal" --no-upgrade
+    done_item "terminal packages installed"
+  fi
+  if [ "$SELECT_OTHER" -eq 1 ]; then
+    DOTFILES_GROUP="other" brew bundle install --file "$REPO_ROOT/Brewfile.other" --no-upgrade
+    done_item "other packages installed"
+  fi
 }
 
 application_exists() {
@@ -197,22 +285,9 @@ install_terminal_dependencies() {
   clone_repo_safely "https://github.com/zsh-users/zsh-syntax-highlighting.git" "$HOME/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting" "zsh-syntax-highlighting"
   clone_repo_safely "https://github.com/zsh-users/zsh-completions.git" "$HOME/.oh-my-zsh/custom/plugins/zsh-completions" "zsh-completions"
   clone_repo_safely "https://github.com/tmux-plugins/tpm.git" "$HOME/.tmux/plugins/tpm" "TPM"
-}
-
-install_tmux_plugins() {
-  if ! cmp -s "$REPO_ROOT/config/tmux/tmux.conf" "$HOME/.tmux.conf"; then
-    manual_item "tmux plugins were not installed because ~/.tmux.conf does not match the managed config"
-    return
-  fi
-
-  plugin_installer="$HOME/.tmux/plugins/tpm/bin/install_plugins"
-  if [ ! -x "$plugin_installer" ]; then
-    manual_item "tmux plugins were not installed because TPM is unavailable at $plugin_installer"
-    return
-  fi
-
-  "$plugin_installer"
-  done_item "tmux plugins installed"
+  clone_repo_safely "https://github.com/tmux-plugins/tmux-sensible.git" "$HOME/.tmux/plugins/tmux-sensible" "tmux-sensible"
+  clone_repo_safely "https://github.com/tmux-plugins/tmux-resurrect.git" "$HOME/.tmux/plugins/tmux-resurrect" "tmux-resurrect"
+  clone_repo_safely "https://github.com/tmux-plugins/tmux-yank.git" "$HOME/.tmux/plugins/tmux-yank" "tmux-yank"
 }
 
 safe_name_for_path() {
@@ -253,12 +328,16 @@ configure_git() {
   install_file_safely "$REPO_ROOT/config/git/.gitconfig-github" "$HOME/.gitconfig-github" "GitHub Git identity"
 }
 
-configure_files() {
+configure_terminal() {
   install_file_safely "$REPO_ROOT/config/ghostty/config" "$HOME/.config/ghostty/config" "Ghostty config"
   install_file_safely "$REPO_ROOT/config/starship/starship.toml" "$HOME/.config/starship.toml" "Starship config"
   install_file_safely "$REPO_ROOT/config/tmux/tmux.conf" "$HOME/.tmux.conf" "tmux config"
   configure_zsh
+}
+
+configure_core() {
   configure_git
+  configure_finder
 }
 
 configure_finder() {
@@ -273,7 +352,7 @@ configure_finder() {
   done_item "Finder hidden files enabled"
 }
 
-write_manual_steps() {
+configure_other() {
   manual_item "Sign in to Google Chrome."
   manual_item "Sign in to Google Drive and confirm sync folders."
   manual_item "Sign in to Yandex Disk and confirm sync folders."
@@ -284,10 +363,123 @@ write_manual_steps() {
   manual_item "Grant Flameshot Screen Recording or Accessibility permission if macOS asks."
 }
 
+CONFIG_DEPENDENCY_ERRORS=0
+MISSING_CORE_DEPENDENCY=0
+MISSING_TERMINAL_DEPENDENCY=0
+MISSING_OTHER_DEPENDENCY=0
+
+missing_config_dependency() {
+  group="$1"
+  description="$2"
+
+  manual_item "$description is required before configuring the $group group."
+  CONFIG_DEPENDENCY_ERRORS=1
+  case "$group" in
+    core) MISSING_CORE_DEPENDENCY=1 ;;
+    terminal) MISSING_TERMINAL_DEPENDENCY=1 ;;
+    other) MISSING_OTHER_DEPENDENCY=1 ;;
+  esac
+}
+
+require_config_command() {
+  group="$1"
+  command_name="$2"
+  label="$3"
+
+  if ! command -v "$command_name" >/dev/null 2>&1; then
+    missing_config_dependency "$group" "$label"
+  fi
+}
+
+require_config_path() {
+  group="$1"
+  path="$2"
+  label="$3"
+
+  if [ ! -e "$path" ]; then
+    missing_config_dependency "$group" "$label"
+  fi
+}
+
+require_config_app() {
+  group="$1"
+  app_name="$2"
+  label="$3"
+
+  if ! application_exists "$app_name"; then
+    missing_config_dependency "$group" "$label"
+  fi
+}
+
+fira_code_installed() {
+  for font_path in "$HOME"/Library/Fonts/FiraCode* /Library/Fonts/FiraCode*; do
+    if [ -e "$font_path" ]; then
+      return 0
+    fi
+  done
+  return 1
+}
+
+validate_config_dependencies() {
+  CONFIG_DEPENDENCY_ERRORS=0
+  MISSING_CORE_DEPENDENCY=0
+  MISSING_TERMINAL_DEPENDENCY=0
+  MISSING_OTHER_DEPENDENCY=0
+
+  if [ "$SELECT_CORE" -eq 1 ]; then
+    require_config_command "core" "git" "Git"
+  fi
+
+  if [ "$SELECT_TERMINAL" -eq 1 ]; then
+    require_config_command "terminal" "git" "Git"
+    require_config_command "terminal" "tmux" "tmux"
+    require_config_command "terminal" "starship" "Starship"
+    require_config_command "terminal" "fzf" "fzf"
+    require_config_app "terminal" "Ghostty.app" "Ghostty"
+    if ! fira_code_installed; then
+      missing_config_dependency "terminal" "Fira Code"
+    fi
+    require_config_path "terminal" "$HOME/.oh-my-zsh/oh-my-zsh.sh" "Oh My Zsh"
+    require_config_path "terminal" "$HOME/.oh-my-zsh/custom/plugins/zsh-autosuggestions" "zsh-autosuggestions"
+    require_config_path "terminal" "$HOME/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting" "zsh-syntax-highlighting"
+    require_config_path "terminal" "$HOME/.oh-my-zsh/custom/plugins/zsh-completions" "zsh-completions"
+    require_config_path "terminal" "$HOME/.tmux/plugins/tpm" "TPM"
+    require_config_path "terminal" "$HOME/.tmux/plugins/tmux-sensible" "tmux-sensible"
+    require_config_path "terminal" "$HOME/.tmux/plugins/tmux-resurrect" "tmux-resurrect"
+    require_config_path "terminal" "$HOME/.tmux/plugins/tmux-yank" "tmux-yank"
+  fi
+
+  if [ "$SELECT_OTHER" -eq 1 ]; then
+    require_config_app "other" "Visual Studio Code.app" "Visual Studio Code"
+    require_config_app "other" "Google Chrome.app" "Google Chrome"
+    require_config_app "other" "Google Drive.app" "Google Drive"
+    require_config_app "other" "Yandex.Disk.app" "Yandex Disk"
+    require_config_app "other" "KeePassXC.app" "KeePassXC"
+    require_config_app "other" "MacWhisper.app" "MacWhisper"
+    require_config_app "other" "Claude.app" "Claude"
+    require_config_app "other" "ChatGPT.app" "ChatGPT"
+    require_config_app "other" "UTM.app" "UTM"
+    require_config_app "other" "Lang Switcher.app" "Lang Switcher"
+  fi
+
+  if [ "$CONFIG_DEPENDENCY_ERRORS" -eq 0 ]; then
+    return 0
+  fi
+
+  log ""
+  log "Configuration prerequisites are missing. No config files were changed."
+  [ "$MISSING_CORE_DEPENDENCY" -eq 0 ] || log "Run: ./install.sh core install"
+  [ "$MISSING_TERMINAL_DEPENDENCY" -eq 0 ] || log "Run: ./install.sh terminal install"
+  [ "$MISSING_OTHER_DEPENDENCY" -eq 0 ] || log "Run: ./install.sh other install"
+  return 1
+}
+
 write_report() {
   {
     printf '# macOS Setup Report\n\n'
     printf -- '- Status: %s\n' "$RUN_STATUS"
+    printf -- '- Groups: %s\n' "$SELECTED_GROUPS"
+    printf -- '- Actions: %s\n' "$SELECTED_ACTIONS"
     printf -- '- Done: %s\n' "$DONE_COUNT"
     printf -- '- Skipped: %s\n' "$SKIP_COUNT"
     printf -- '- Manual steps: %s\n\n' "$MANUAL_COUNT"
@@ -317,21 +509,34 @@ handle_error() {
 }
 
 main() {
+  parse_args "$@"
   require_macos
   preflight
   print_plan
   confirm
   init_state
   trap 'handle_error "$?" "$LINENO" "$BASH_COMMAND"' ERR
-  ensure_homebrew
-  install_brew_bundle
-  install_app_store_apps
-  install_optional_cask "flameshot" "Flameshot" "Flameshot.app"
-  install_terminal_dependencies
-  configure_files
-  install_tmux_plugins
-  configure_finder
-  write_manual_steps
+  if [ "$DO_INSTALL" -eq 1 ]; then
+    ensure_homebrew
+    install_brew_bundle
+    if [ "$SELECT_TERMINAL" -eq 1 ]; then
+      install_terminal_dependencies
+    fi
+    if [ "$SELECT_OTHER" -eq 1 ]; then
+      install_app_store_apps
+      install_optional_cask "flameshot" "Flameshot" "Flameshot.app"
+    fi
+  fi
+  if [ "$DO_CONFIG" -eq 1 ]; then
+    if ! validate_config_dependencies; then
+      RUN_STATUS="Failed"
+      write_report
+      exit 1
+    fi
+    [ "$SELECT_CORE" -eq 0 ] || configure_core
+    [ "$SELECT_TERMINAL" -eq 0 ] || configure_terminal
+    [ "$SELECT_OTHER" -eq 0 ] || configure_other
+  fi
   write_report
   trap - ERR
 }

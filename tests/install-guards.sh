@@ -59,8 +59,32 @@ case "${1:-}" in
     if [ "${FAKE_BUNDLE_FAIL:-0}" = "1" ]; then
       exit 1
     fi
-    printf '%s\n' "$*" > "$HOME/.brew-bundle-args"
+    printf '%s\n' "$*" >> "$HOME/.brew-bundle-args"
+    printf '%s\n' "$DOTFILES_GROUP" >> "$HOME/.brew-bundle-groups"
     : > "$HOME/.brew-bundle-ran"
+    case "$DOTFILES_GROUP" in
+      terminal)
+        for command_name in tmux starship fzf; do
+          printf '#!/usr/bin/env bash\nexit 0\n' > "$(dirname "$0")/$command_name"
+          chmod +x "$(dirname "$0")/$command_name"
+        done
+        mkdir -p "$APPLICATIONS_DIR/Ghostty.app"
+        mkdir -p "$HOME/Library/Fonts"
+        : > "$HOME/Library/Fonts/FiraCode-Regular.ttf"
+        ;;
+      other)
+        mkdir -p \
+          "$APPLICATIONS_DIR/Visual Studio Code.app" \
+          "$APPLICATIONS_DIR/Google Chrome.app" \
+          "$APPLICATIONS_DIR/Google Drive.app" \
+          "$APPLICATIONS_DIR/Yandex.Disk.app" \
+          "$APPLICATIONS_DIR/KeePassXC.app" \
+          "$APPLICATIONS_DIR/MacWhisper.app" \
+          "$APPLICATIONS_DIR/Claude.app" \
+          "$APPLICATIONS_DIR/ChatGPT.app" \
+          "$APPLICATIONS_DIR/UTM.app"
+        ;;
+    esac
     exit 0
     ;;
   list)
@@ -124,6 +148,7 @@ case "${1:-}" in
   install)
     test "${2:-}" = "1597566195"
     : > "$HOME/.lang-switcher-installed"
+    mkdir -p "$USER_APPLICATIONS_DIR/Lang Switcher.app"
     ;;
 esac
 EOF
@@ -194,7 +219,12 @@ test ! -d "$RUN_DIR/state" || fail "preflight should stop before state files are
 
 prepare_case "conflict" "Darwin" "arm64"
 mkdir -p "$FAKE_HOME/.config/ghostty"
-mkdir -p "$FAKE_HOME/.oh-my-zsh/custom/plugins/zsh-autosuggestions"
+mkdir -p \
+  "$FAKE_HOME/.oh-my-zsh/.git" \
+  "$FAKE_HOME/.oh-my-zsh/custom/plugins/zsh-autosuggestions/.git" \
+  "$FAKE_HOME/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting/.git" \
+  "$FAKE_HOME/.oh-my-zsh/custom/plugins/zsh-completions/.git"
+: > "$FAKE_HOME/.oh-my-zsh/oh-my-zsh.sh"
 printf 'local ghostty setting\n' > "$FAKE_HOME/.config/ghostty/config"
 printf 'local tmux setting\n' > "$FAKE_HOME/.tmux.conf"
 printf 'local plugin setting\n' > "$FAKE_HOME/.oh-my-zsh/custom/plugins/zsh-autosuggestions/local-setting"
@@ -210,17 +240,13 @@ test "$(cat "$FAKE_HOME/.tmux.conf")" = "local tmux setting" || fail "existing t
 test -f "$RUN_DIR/state/candidates/HOME_.tmux.conf" || fail "conflicting tmux config should write a candidate"
 cmp -s "$RUN_DIR/config/tmux/tmux.conf" "$RUN_DIR/state/candidates/HOME_.tmux.conf" || fail "tmux candidate should match repository config"
 test "$(cat "$FAKE_HOME/.oh-my-zsh/custom/plugins/zsh-autosuggestions/local-setting")" = "local plugin setting" || fail "existing plugin directory should be left untouched"
-test ! -f "$FAKE_HOME/.tmux/plugins/.install-plugins-ran" || fail "tmux plugins should not be installed for a conflicting tmux config"
-assert_contains "$output" "zsh config was not installed because Oh My Zsh is incomplete"
-if grep -F "# >>> dotfiles zsh" "$FAKE_HOME/.zshrc" >/dev/null; then
-  fail "managed zsh block should not be added when Oh My Zsh is incomplete"
-fi
+test -d "$FAKE_HOME/.tmux/plugins/tmux-sensible/.git" || fail "tmux plugins should install independently of tmux config"
+assert_contains "$output" "zsh loader differs from existing"
+test "$(cat "$FAKE_HOME/.zshrc")" = "# local zshrc" || fail "existing zshrc should be left untouched"
 
 output="$(cd "$RUN_DIR" && printf 'y\n' | ./install.sh)"
-assert_contains "$output" "zsh config was not installed because Oh My Zsh is incomplete"
-if grep -F "# >>> dotfiles zsh" "$FAKE_HOME/.zshrc" >/dev/null; then
-  fail "repeated runs should not add a managed block when Oh My Zsh is incomplete"
-fi
+assert_contains "$output" "zsh loader differs from existing"
+test "$(cat "$FAKE_HOME/.zshrc")" = "# local zshrc" || fail "repeated runs should leave existing zshrc untouched"
 
 prepare_case "zsh-loader-conflict" "Darwin" "arm64"
 printf '# keep my local zsh setup\n' > "$FAKE_HOME/.zshrc"
@@ -251,5 +277,56 @@ output="$(cd "$RUN_DIR" && printf 'y\n' | ./install.sh)"
 assert_contains "$output" "Flameshot was not installed automatically"
 assert_contains "$output" "Report written to"
 test -f "$FAKE_HOME/.config/ghostty/config" || fail "optional app failure should not stop configuration"
+
+prepare_case "core-config-only" "Darwin" "arm64"
+output="$(cd "$RUN_DIR" && printf 'y\n' | ./install.sh core config)"
+assert_contains "$output" "Plan for groups: core"
+test ! -f "$FAKE_HOME/.brew-bundle-ran" || fail "config action should not install packages"
+test -f "$FAKE_HOME/.gitconfig" || fail "core config should install Git config"
+test ! -f "$FAKE_HOME/.config/ghostty/config" || fail "core config should not install terminal config"
+test ! -f "$FAKE_HOME/.config/starship.toml" || fail "core config should not install Starship config"
+
+prepare_case "combined-groups-actions" "Darwin" "arm64"
+output="$(cd "$RUN_DIR" && printf 'y\n' | ./install.sh terminal core config install)"
+assert_contains "$output" "Plan for groups: core terminal"
+test "$(cat "$FAKE_HOME/.brew-bundle-groups")" = "core
+terminal" || fail "selected groups should reach Brew Bundle"
+test -f "$FAKE_HOME/.gitconfig" || fail "combined core config should install Git config"
+test -f "$FAKE_HOME/.config/ghostty/config" || fail "combined terminal config should install Ghostty config"
+test -d "$FAKE_HOME/.oh-my-zsh/.git" || fail "combined terminal install should install Oh My Zsh"
+test -d "$FAKE_HOME/.tmux/plugins/tmux-yank/.git" || fail "combined terminal install should install tmux plugins"
+test ! -f "$FAKE_HOME/.lang-switcher-installed" || fail "unselected other group should not install Lang Switcher"
+test ! -f "$FAKE_HOME/.flameshot-installed" || fail "unselected other group should not install Flameshot"
+
+prepare_case "other-install-only" "Darwin" "arm64"
+output="$(cd "$RUN_DIR" && printf 'y\n' | ./install.sh other install)"
+test "$(cat "$FAKE_HOME/.brew-bundle-groups")" = "other" || fail "other group should reach Brew Bundle"
+test -f "$FAKE_HOME/.lang-switcher-installed" || fail "other install should install Lang Switcher"
+test -f "$FAKE_HOME/.flameshot-installed" || fail "other install should install Flameshot"
+test ! -f "$FAKE_HOME/.gitconfig" || fail "install action should not configure Git"
+test ! -f "$FAKE_HOME/.config/ghostty/config" || fail "other install should not install terminal config"
+
+prepare_case "terminal-config-missing-dependencies" "Darwin" "arm64"
+set +e
+output="$(cd "$RUN_DIR" && printf 'y\n' | ./install.sh terminal config 2>&1)"
+status="$?"
+set -e
+test "$status" -ne 0 || fail "terminal config should fail when its programs are missing"
+assert_contains "$output" "Configuration prerequisites are missing"
+assert_contains "$output" "Run: ./install.sh terminal install"
+assert_contains "$output" "Starship is required before configuring the terminal group"
+assert_contains "$output" "Fira Code is required before configuring the terminal group"
+test ! -f "$FAKE_HOME/.config/ghostty/config" || fail "failed validation should not write Ghostty config"
+test ! -f "$FAKE_HOME/.config/starship.toml" || fail "failed validation should not write Starship config"
+test ! -f "$FAKE_HOME/.tmux.conf" || fail "failed validation should not write tmux config"
+
+prepare_case "invalid-argument" "Darwin" "arm64"
+set +e
+output="$(cd "$RUN_DIR" && ./install.sh unknown 2>&1)"
+status="$?"
+set -e
+test "$status" -eq 2 || fail "unknown arguments should exit with status 2"
+assert_contains "$output" "Unknown argument: unknown"
+test ! -d "$RUN_DIR/state" || fail "invalid arguments should stop before state initialization"
 
 printf 'install guard tests passed\n'

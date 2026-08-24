@@ -1,0 +1,9 @@
+# Cross-group dependencies: Git clones shell/plugin repositories, and the Ghostty config selects Fira Code.
+brew "git"
+cask "font-fira-code"
+
+brew "tmux"
+brew "starship"
+brew "fzf"
+
+cask "ghostty" unless File.exist?("/Applications/Ghostty.app") || File.exist?(File.expand_path("~/Applications/Ghostty.app"))
